@@ -12,7 +12,7 @@ export class NavabrComponent {
   navLinks = [
     { label: 'Accueil', path: '/accueil' },
     { label: 'Programmes', path: '/programme' },
-    { label: 'Carte Interactive', path: '/carte' },
-    { label: 'Actualités', path: '/actualites' },
+    { label: 'Carte Action', path: '/carte-action' },
+    { label: 'Réalisations', path: '/actualites' },
   ];
 }

@@ -1,0 +1,11 @@
+#map-senegal {
+  height: 100%;
+  width: 100%;
+  z-index: 1; /* Pour rester sous les menus déroulants */
+}
+
+/* Style pour enlever la bordure bleue au clic sur les marqueurs */
+.leaflet-marker-icon {
+  border: none !important;
+  background: none !important;
+}
