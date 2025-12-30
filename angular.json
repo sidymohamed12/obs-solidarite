@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "obs-solidarite": {
+    "TAXAWU": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:service": {
@@ -80,10 +80,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "obs-solidarite:build:production"
+              "buildTarget": "TAXAWU:build:production"
             },
             "development": {
-              "buildTarget": "obs-solidarite:build:development"
+              "buildTarget": "TAXAWU:build:development"
             }
           },
           "defaultConfiguration": "development"

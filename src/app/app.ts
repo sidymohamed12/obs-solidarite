@@ -9,5 +9,5 @@ import { NavabrComponent } from './shared/components/navabr/navabr.component';
   styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('obs-solidarite');
+  protected readonly title = signal('TAXAWU');
 }
