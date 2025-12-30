@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ministère de la Famille et des Solidarités - Sénégal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+
+      .primary-gradient {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      }
+
+      dialog::backdrop {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(8px);
+      }
+
+      dialog {
+        outline: none;
+        border: none;
+      }
+
+      .animate-scroll {
+        display: flex;
+        width: max-content;
+        animation: scroll 40s linear infinite;
+      }
+
+      @keyframes scroll {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-white text-slate-900">
+    <section class="relative h-[650px] w-full overflow-hidden bg-slate-900">
+      <div class="absolute inset-0">
+        <img
+          src="https://www.devcommunautaire.gouv.sn/sites/default/files/gva-sliderlayer-upload/slide%203-nkmqxb.jpg"
+          class="w-full h-full object-cover object-center opacity-60"
+          alt="Ministre au bureau"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/40 to-transparent"
+        ></div>
+      </div>
+
+      <div class="relative max-w-7xl mx-auto h-full px-6 flex flex-col justify-center">
+        <div class="max-w-3xl">
+          <div
+            class="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 px-4 py-2 rounded-full text-emerald-400 text-sm font-bold mb-6 backdrop-blur-md"
+          >
+            <span class="relative flex h-3 w-3">
+              <span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+              ></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+            Action Gouvernementale : Équité & Solidarité
+          </div>
+
+          <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight">
+            Bâtir un Sénégal <span class="text-emerald-500">Inclusif</span>
+          </h1>
+
+          <p class="text-gray-300 text-xl mb-10 leading-relaxed max-w-xl">
+            Réduire les disparités sociales et territoriales pour un développement harmonieux au
+            service de chaque famille.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+            <div
+              class="bg-white/10 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex items-center gap-4"
+            >
+              <div class="bg-emerald-500 p-3 rounded-xl shadow-lg">
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-gray-400 text-xs uppercase font-bold">Événement Clé</p>
+                <p class="text-white font-semibold italic">15 Mai : J.I. des Familles</p>
+              </div>
+            </div>
+
+            <div
+              class="bg-white/10 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex items-center gap-4"
+            >
+              <div class="bg-blue-500 p-3 rounded-xl shadow-lg">
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-gray-400 text-xs uppercase font-bold">Impact 2024</p>
+                <p class="text-white font-semibold">+120 000 Bénéficiaires</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-4">
+            <button
+              class="bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-4 rounded-full font-bold transition-all transform hover:scale-105"
+            >
+              Faire une demande
+            </button>
+            <button
+              class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-10 py-4 rounded-full font-bold transition-all backdrop-blur-sm"
+            >
+              Explorer les aides ↗
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-24 bg-slate-50">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
+          <div
+            class="lg:col-span-5 relative overflow-hidden bg-white rounded-[40px] shadow-xl group border border-slate-100"
+          >
+            <div class="aspect-[4/5] overflow-hidden">
+              <img
+                src="https://www.devcommunautaire.gouv.sn/sites/default/files/PRESIDENT%20DIOMAYE.jpg"
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                alt="Président"
+              />
+            </div>
+            <div
+              class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent p-10 text-white"
+            >
+              <p class="text-emerald-400 font-bold text-sm tracking-widest uppercase mb-2">
+                Président de la République
+              </p>
+              <h3 class="text-3xl font-bold mb-4">S.E. Bassirou Diomaye Faye</h3>
+              <p class="text-slate-300 italic">"Un Sénégal de tous, un Sénégal pour tous."</p>
+            </div>
+          </div>
+
+          <div
+            class="lg:col-span-7 flex flex-col bg-emerald-900 rounded-[40px] overflow-hidden shadow-2xl relative"
+          >
+            <div class="p-10 md:p-14 flex flex-col h-full z-10">
+              <div class="flex flex-col md:flex-row gap-8 items-center mb-10">
+                <div
+                  class="w-40 h-40 shrink-0 rounded-3xl overflow-hidden border-4 border-emerald-700 shadow-2xl"
+                >
+                  <img
+                    src="https://www.devcommunautaire.gouv.sn/sites/default/files/Maimouna_Dieye_Officiel-1.png"
+                    class="w-full h-full object-cover"
+                    alt="Mme la Ministre"
+                  />
+                </div>
+                <div class="text-center md:text-left">
+                  <p class="text-emerald-400 font-bold text-sm tracking-widest uppercase mb-1">
+                    Mot de la Ministre
+                  </p>
+                  <h3 class="text-3xl font-bold text-white mb-2">Mme Maïmouna DIEYE</h3>
+                  <p class="text-emerald-100/60 font-medium">
+                    Ministre de la Famille et des Solidarités
+                  </p>
+                </div>
+              </div>
+
+              <p class="text-emerald-50/90 leading-relaxed text-xl italic mb-10">
+                « En initiant ce site d’information, j’engage mon département à institutionnaliser
+                une communication officielle mais aussi interactive, conformément à la vision du
+                Chef de l’Etat... »
+              </p>
+
+              <button
+                onclick="document.getElementById('modal-mot-ministre').showModal()"
+                class="bg-white text-emerald-900 w-fit px-8 py-4 rounded-2xl font-bold hover:bg-emerald-50 transition-all shadow-xl"
+              >
+                Lire le message complet
+              </button>
+            </div>
+            <div
+              class="absolute -bottom-10 -right-10 w-64 h-64 bg-emerald-800 rounded-full opacity-20"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-24 bg-white">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-20 items-center">
+          <div class="lg:w-1/2 relative group px-4 py-10">
+            <div
+              class="absolute top-12 left-12 w-full h-full bg-slate-100 rounded-2xl rotate-6 border border-slate-200"
+            >
+              <img
+                src="https://actu.rts.sn/wp-content/uploads/2024/04/decrett1.png"
+                class="w-full h-full object-cover rounded-2xl opacity-40"
+                alt="Décret P2"
+              />
+            </div>
+            <div
+              class="relative z-10 bg-white p-3 rounded-2xl shadow-2xl -rotate-2 hover:rotate-0 transition-all duration-500 cursor-zoom-in"
+              onclick="document.getElementById('modal-images-decret').showModal()"
+            >
+              <img
+                src="https://actu.rts.sn/wp-content/uploads/2024/04/decrett2.png"
+                class="w-full h-auto rounded-xl border border-slate-50"
+                alt="Décret P1"
+              />
+              <div
+                class="absolute -bottom-4 -right-4 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3"
+              >
+                <span class="text-xs font-black uppercase">Agrandir le décret</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:w-1/2">
+            <h2 class="text-4xl font-black text-slate-900 mb-6">Missions & Attributions</h2>
+            <p class="text-slate-500 text-lg mb-10 leading-relaxed">
+              Le Décret n° 2024-957 fixe le cadre d'intervention pour la politique familiale et le
+              développement des solidarités.
+            </p>
+
+            <div class="space-y-4">
+              <div
+                class="p-6 bg-slate-50 rounded-3xl border border-slate-100 hover:border-emerald-200 transition-all cursor-pointer"
+                onclick="document.getElementById('modal-texte-decret').showModal()"
+              >
+                <h4 class="font-bold text-slate-900 flex items-center gap-3 text-lg">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Pôle Famille
+                </h4>
+                <p class="text-slate-500 text-sm mt-2">
+                  Protection des femmes, droits des enfants et valeurs familiales.
+                </p>
+              </div>
+              <div
+                class="p-6 bg-slate-50 rounded-3xl border border-slate-100 hover:border-blue-200 transition-all cursor-pointer"
+                onclick="document.getElementById('modal-texte-decret').showModal()"
+              >
+                <h4 class="font-bold text-slate-900 flex items-center gap-3 text-lg">
+                  <span class="w-2 h-2 rounded-full bg-blue-500"></span> Pôle Solidarités
+                </h4>
+                <p class="text-slate-500 text-sm mt-2">
+                  Inclusion sociale, Couverture Sanitaire Universelle et lutte contre les
+                  inégalités.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onclick="document.getElementById('modal-texte-decret').showModal()"
+              class="mt-10 bg-slate-900 text-white px-8 py-4 rounded-xl font-bold hover:bg-emerald-600 transition-all"
+            >
+              Consulter le texte intégral
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <dialog id="modal-mot-ministre" class="rounded-3xl shadow-2xl max-w-4xl w-full">
+      <div class="bg-white flex flex-col max-h-[90vh]">
+        <div class="p-6 border-b flex justify-between items-center bg-slate-50 sticky top-0">
+          <h3 class="font-black uppercase text-slate-900">Message de Mme Maïmouna DIEYE</h3>
+          <button onclick="document.getElementById('modal-mot-ministre').close()" class="text-3xl">
+            &times;
+          </button>
+        </div>
+        <div class="p-10 overflow-y-auto text-slate-700 leading-relaxed space-y-4">
+          <p><strong>Chers internautes,</strong></p>
+          <p>
+            En initiant ce site d’information, j’engage mon département à institutionnaliser une
+            communication officielle mais aussi inter active, conformément à la vision du Chef de
+            l’Etat...
+          </p>
+          <p>
+            Mon objectif principal est d’opérationnaliser la vision du Chef de l’Etat de « Un
+            Sénégal de tous, un Sénégal pour tous » en promouvant une politique contributive au
+            développement territorial équitable...
+          </p>
+          <p>
+            Je vous invite à parcourir quotidiennement cet espace dédié et à interagir avec le
+            Ministère qui est le vôtre.
+          </p>
+          <p class="pt-6 font-bold">
+            Madame Maïmouna DIEYE<br /><span class="text-emerald-600"
+              >Ministre de la Famille et des Solidarités</span
+            >
+          </p>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog
+      id="modal-images-decret"
+      class="rounded-3xl shadow-2xl max-w-5xl w-full bg-slate-900/95 backdrop-blur-sm"
+    >
+      <div class="p-6">
+        <div class="flex justify-between items-center text-white mb-6">
+          <h3 class="font-bold">Documents Officiels (Fac-similés)</h3>
+          <button onclick="document.getElementById('modal-images-decret').close()" class="text-3xl">
+            &times;
+          </button>
+        </div>
+        <div class="flex flex-col md:flex-row gap-6 max-h-[70vh] overflow-y-auto p-2">
+          <img
+            src="https://actu.rts.sn/wp-content/uploads/2024/04/decrett2.png"
+            class="w-full md:w-1/2 rounded-xl"
+            alt="P1"
+          />
+          <img
+            src="https://actu.rts.sn/wp-content/uploads/2024/04/decrett1.png"
+            class="w-full md:w-1/2 rounded-xl"
+            alt="P2"
+          />
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="modal-texte-decret" class="rounded-3xl shadow-2xl max-w-4xl w-full">
+      <div class="bg-white flex flex-col max-h-[90vh]">
+        <div class="p-6 border-b flex justify-between items-center bg-slate-50 sticky top-0">
+          <h3 class="font-black uppercase text-slate-900">Transcription du Décret 2024-957</h3>
+          <button onclick="document.getElementById('modal-texte-decret').close()" class="text-3xl">
+            &times;
+          </button>
+        </div>
+        <div class="p-10 overflow-y-auto font-serif">
+          <div class="border-l-4 border-emerald-500 pl-6 mb-10">
+            <h4 class="text-xl font-bold">Article 1er</h4>
+            <p class="italic text-slate-600">
+              Sous l’autorité du Premier Ministre, le Ministre de la Famille et des Solidarités
+              prépare et met en œuvre la politique définie par le Chef de l’Etat...
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-10">
+            <div>
+              <h5 class="font-bold text-emerald-700 uppercase text-sm tracking-widest mb-4">
+                Au titre de la Famille
+              </h5>
+              <ul class="text-sm space-y-3 text-slate-600">
+                <li>• Élaboration des politiques de développement social.</li>
+                <li>• Veille au respect des droits des femmes et des enfants.</li>
+                <li>• Promotion de l'entrepreneuriat féminin.</li>
+                <li>• Prise en charge des enfants en situation de rue.</li>
+              </ul>
+            </div>
+            <div>
+              <h5 class="font-bold text-blue-700 uppercase text-sm tracking-widest mb-4">
+                Au titre des Solidarités
+              </h5>
+              <ul class="text-sm space-y-3 text-slate-600">
+                <li>• Pilotage du développement communautaire.</li>
+                <li>• Extension de la Couverture Sanitaire Universelle (CSU).</li>
+                <li>• Lutte contre les fractures territoriales.</li>
+                <li>• Gestion du Fonds de Solidarité Nationale.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <script>
+      // Fermeture des modals au clic sur le backdrop
+      const modals = document.querySelectorAll('dialog');
+      modals.forEach((modal) => {
+        modal.addEventListener('click', (e) => {
+          const dialogDimensions = modal.getBoundingClientRect();
+          if (
+            e.clientX < dialogDimensions.left ||
+            e.clientX > dialogDimensions.right ||
+            e.clientY < dialogDimensions.top ||
+            e.clientY > dialogDimensions.bottom
+          ) {
+            modal.close();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
