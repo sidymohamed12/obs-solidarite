@@ -13,6 +13,6 @@ export class NavabrComponent {
     { label: 'Accueil', path: '/accueil' },
     { label: 'Programmes', path: '/programme' },
     { label: 'Carte Action', path: '/carte-action' },
-    { label: 'Réalisations', path: '/actualites' },
+    { label: 'Réalisations', path: '/realisations-actualites' },
   ];
 }
