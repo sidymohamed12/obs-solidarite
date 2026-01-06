@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MapComponent } from '../map/map.component';
+import { MapComponent } from './components/map/map.component';
 
 @Component({
   selector: 'app-carte-action',

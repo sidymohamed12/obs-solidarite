@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { FilterOptions } from '../../models/programme.model';
 import { LeafletMapComponent } from '../leaflet-map/leaflet-map.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FilterOptions } from '../../../../models/programme.model';
 
 @Component({
   selector: 'app-map',
