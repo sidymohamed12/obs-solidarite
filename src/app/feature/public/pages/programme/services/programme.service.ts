@@ -1,21 +1,12 @@
-import { Component } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { Programme } from '../../../models/programme.model';
 
-export interface Programme {
-  id: string;
-  titre: string;
-  category: string;
-  description: string;
-  image: string;
-}
-
-@Component({
-  selector: 'app-programme',
-  imports: [],
-  templateUrl: './programme.component.html',
-  styleUrl: './programme.component.css',
+@Injectable({
+  providedIn: 'root',
 })
-export class ProgrammeComponent {
-  programmes: Programme[] = [
+export class ProgrammeService {
+  private readonly programmes: Programme[] = [
     {
       id: '1',
       titre: 'Délégation générale à la Protection sociale et à la Solidarité nationale (DGPSN)',
@@ -60,4 +51,20 @@ export class ProgrammeComponent {
       image: 'https://www.papsa.sn/images/logo-papsa.png',
     },
   ];
+
+  getPrograms(): Observable<Programme[]> {
+    return of(this.programmes);
+  }
+
+  getProgramById(id: string): Observable<Programme | undefined> {
+    return of(this.programmes.find((p) => p.id === id));
+  }
+
+  getProgramsByCategory(category: string): Observable<Programme[]> {
+    return of(this.programmes.filter((p) => p.category === category));
+  }
+
+  get3Programs(): Observable<Programme[]> {
+    return of(this.programmes.slice(0, 3));
+  }
 }

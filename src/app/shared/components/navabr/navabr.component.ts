@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-navabr',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './navabr.component.html',
   styleUrl: './navabr.component.css',
 })

@@ -1,5 +1,5 @@
 <nav class="sticky top-0 z-50 w-full border-b border-slate-100 glass-effect">
-  <div class="max-w-[2560px] mx-auto px-4 sm:px-8 lg:px-16 flex justify-between items-center h-20">
+  <div class="max-w-640 mx-auto px-4 sm:px-8 lg:px-16 flex justify-between items-center h-20">
     <div class="flex items-center gap-3">
       <div class="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
         <img class="w-full h-full object-cover" src="logo.png" alt="Logo" />
@@ -15,18 +15,19 @@
     </div>
 
     <div class="hidden lg:flex items-center gap-8 font-medium text-slate-600">
+      @for (link of navLinks; track $index) {
       <a
-        *ngFor="let link of navLinks"
         [routerLink]="link.path"
-        routerLinkActive="text-emerald-600 border-b-2 border-emerald-600"
-        class="hover:text-emerald-600 transition-colors py-2"
+        routerLinkActive="text-primary border-b-2 border-primary"
+        class="hover:text-primary hover:border-b-2 hover:border-primary transition-colors py-2"
       >
         {{ link.label }}
       </a>
+      }
     </div>
 
     <div class="flex items-center gap-4">
-      <button class="hidden md:block text-slate-600 font-medium hover:text-emerald-600 transition">
+      <button class="hidden md:block text-slate-600 font-medium hover:text-primary transition">
         Connexion
       </button>
       <button class="bg-primary text-white px-5 py-2 rounded-full hover:bg-opacity-90 transition">

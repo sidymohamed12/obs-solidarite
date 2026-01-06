@@ -1,12 +1,9 @@
-export interface Program {
+export interface Programme {
   id: string;
-  title: string;
+  titre: string;
+  category: string;
   description: string;
-  icon: string;
-  beneficiaries: string;
-  color: string;
-  bgColor: string;
-  iconBg: string;
+  image: string;
 }
 
 export interface FilterOptions {

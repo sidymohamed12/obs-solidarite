@@ -1,27 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Article } from '../../../../models/article.model';
+import { ArticleService } from '../../services/article.service';
+import { finalize } from 'rxjs';
 
 interface Slide {
   image: string;
   badge: string;
   title: string;
   description: string;
-}
-
-interface Article {
-  id: number;
-  type: 'news' | 'stats' | 'regular';
-  image?: string;
-  badge?: string;
-  date?: string;
-  title: string;
-  description?: string;
-  tags?: string;
-  stats?: {
-    label: string;
-    value: string;
-    percentage: number;
-  };
 }
 
 @Component({
@@ -51,42 +38,10 @@ export class RealisationActualiteComponent implements OnInit, OnDestroy {
     },
   ];
 
-  articles: Article[] = [
-    {
-      id: 1,
-      type: 'news',
-      image:
-        'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=800',
-      badge: 'Actualité',
-      date: 'Il y a 2 jours',
-      title: 'Inauguration du centre de réinsertion à Koumassi',
-      description:
-        "Le ministère renforce sa présence de proximité avec l'ouverture d'un complexe moderne dédié aux jeunes.",
-      tags: '#Social #Jeunesse',
-    },
-    {
-      id: 2,
-      type: 'stats',
-      title: 'Bilan Chiffré 2025 : 1.2M de kits distribués',
-      stats: {
-        label: 'Objectif Atteint',
-        value: '94%',
-        percentage: 94,
-      },
-    },
-    {
-      id: 3,
-      type: 'news',
-      image:
-        'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80&w=800',
-      badge: 'Actualité',
-      date: 'Il y a 5 jours',
-      title: 'Programme "Troisième Âge" : Santé étendue',
-      description:
-        'Nouveaux partenariats cliniques permettant une prise en charge à 100% des soins ophtalmologiques.',
-      tags: '#Sante #Seniors',
-    },
-  ];
+  articles: Article[] = [];
+  isArticleLoading: boolean = false;
+
+  private readonly articleService: ArticleService = inject(ArticleService);
 
   activeFilter = 'all';
   displayedArticles = 3;
@@ -94,10 +49,26 @@ export class RealisationActualiteComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.startAutoPlay();
+    this.loadArticles();
   }
 
   ngOnDestroy(): void {
     this.stopAutoPlay();
+  }
+
+  loadArticles(): void {
+    this.isArticleLoading = true;
+    this.articleService
+      .getArticles()
+      .pipe(finalize(() => (this.isArticleLoading = false)))
+      .subscribe({
+        next: (articles) => {
+          this.articles = articles;
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
   }
 
   startAutoPlay(): void {
@@ -132,12 +103,6 @@ export class RealisationActualiteComponent implements OnInit, OnDestroy {
 
   setFilter(filter: string): void {
     this.activeFilter = filter;
-    // Ici vous pouvez ajouter la logique de filtrage des articles
-  }
-
-  loadMoreArticles(): void {
-    this.displayedArticles += 3;
-    // Ici vous pouvez charger plus d'articles depuis un service
   }
 
   getProgressPercentage(): number {
@@ -146,6 +111,5 @@ export class RealisationActualiteComponent implements OnInit, OnDestroy {
 
   onArticleClick(article: Article): void {
     console.log('Article clicked:', article);
-    // Naviguez vers la page de détail de l'article
   }
 }

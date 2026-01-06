@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { Region, RegionData } from '../models/region.model';
+import { Region, RegionData } from '../../../models/region.model';
 
 @Injectable({
   providedIn: 'root',
@@ -44,7 +44,7 @@ export class RegionService {
     },
   ];
 
-  private regionsData: RegionData[] = [
+  private readonly regionsData: RegionData[] = [
     {
       rank: 1,
       name: 'Dakar',
