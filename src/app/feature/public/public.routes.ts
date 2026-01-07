@@ -4,6 +4,7 @@ import { AccueilComponent } from './pages/accueil/accueil.component';
 import { ProgrammeComponent } from './pages/programme/pages/list-programme/programme.component';
 import { CarteActionComponent } from './pages/carte-action/carte-action.component';
 import { RealisationActualiteComponent } from './pages/realisation-actualite/pages/list-article/realisation-actualite.component';
+import { AddDemandeComponent } from './pages/demandes/pages/add-demande/add-demande.component';
 
 export const PUBLIC_ROUTES: Routes = [
   {
@@ -15,6 +16,7 @@ export const PUBLIC_ROUTES: Routes = [
       { path: 'programme', component: ProgrammeComponent, title: 'Programmes' },
       // { path: 'programme/:id', component: ProgrammeComponent, title: 'Programmes' },
       { path: 'carte-action', component: CarteActionComponent, title: 'Carte Action' },
+      { path: 'add-demande', component: AddDemandeComponent, title: 'Déposer une demande' },
       {
         path: 'realisations-actualites',
         component: RealisationActualiteComponent,
