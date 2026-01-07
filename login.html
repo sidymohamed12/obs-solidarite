@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion - Observatoire des Solidarités</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script></script>
+    <style>
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .animate-fadeInUp {
+        animation: fadeInUp 0.8s ease-out forwards;
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 1s ease-out forwards;
+      }
+
+      input:focus {
+        outline: none;
+      }
+
+      .tab-active {
+        background: white;
+        color: rgb(5 150 105);
+        font-weight: 600;
+      }
+
+      .tab-inactive {
+        background: transparent;
+        color: black;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <!-- Container principal -->
+    <div class="h-fit rounded-3xl flex flex-col lg:flex-row max-w-7xl m-auto bg-white">
+      <!-- Section gauche - Illustration/Branding -->
+      <div class="hidden lg:flex lg:w-1/2 xl:w-3/5 relative overflow-hidden bg-[#047857]">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div
+            class="w-[400px] h-[400px] border-2 border-white/5 rounded-full animate-[ping_10s_linear_infinite]"
+          ></div>
+          <div class="absolute w-[600px] h-[600px] border-2 border-white/5 rounded-full"></div>
+          <div class="absolute w-[800px] h-[800px] border-2 border-white/5 rounded-full"></div>
+        </div>
+
+        <div
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-400/20 rounded-full blur-[120px]"
+        ></div>
+
+        <div
+          class="relative z-10 flex flex-col items-center justify-center w-full p-12 text-center text-white"
+        >
+          <div class="animate-fadeInUp">
+            <div class="relative mb-10 inline-block group">
+              <div
+                class="absolute -inset-8 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700"
+              ></div>
+
+              <div
+                class="relative w-48 h-48 xl:w-64 xl:h-64 bg-white p-8 xl:p-12 rounded-[3rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] flex items-center justify-center transform transition-all duration-500 hover:scale-105 hover:rotate-1"
+              >
+                <img src="public/logo.png" alt="Logo Taxawu" class="w-full h-full object-contain" />
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <h1 class="text-6xl xl:text-7xl font-black tracking-tighter uppercase mb-2">
+                Taxawu
+              </h1>
+              <div class="flex items-center justify-center gap-4">
+                <div class="h-px w-12 bg-emerald-300/50"></div>
+                <p
+                  class="text-xl xl:text-2xl font-light tracking-[0.2em] uppercase text-emerald-100"
+                >
+                  Observatoire des Solidarités
+                </p>
+                <div class="h-px w-12 bg-emerald-300/50"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="absolute bottom-12 left-0 right-0 px-12 animate-fadeInUp delay-300">
+            <div class="max-w-md mx-auto py-4 border-t border-white/10">
+              <p class="text-emerald-50/60 text-sm font-medium uppercase tracking-[0.3em]">
+                République du Sénégal
+              </p>
+              <p class="text-xs text-emerald-200/40 mt-1">
+                Ministère de la Famille et des Solidarités
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="absolute top-10 left-10 w-20 h-20 border-t-2 border-l-2 border-white/10 rounded-tl-3xl"
+        ></div>
+        <div
+          class="absolute bottom-10 right-10 w-20 h-20 border-b-2 border-r-2 border-white/10 rounded-br-3xl"
+        ></div>
+      </div>
+
+      <!-- Section droite - Formulaire de connexion -->
+      <div class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div class="w-full max-w-md xl:max-w-lg 2xl:max-w-xl">
+          <!-- Logo mobile -->
+          <div class="lg:hidden mb-8 sm:mb-10 text-center animate-fadeInUp">
+            <div
+              class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl mb-4 shadow-lg"
+            >
+              <img src="public/logo.png" alt="" />
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+              Observatoire des Solidarités
+            </h1>
+            <p class="text-sm text-gray-600 mt-2">Ministère de la Famille & Action Sociale</p>
+          </div>
+
+          <!-- Titre -->
+          <div class="mb-6 sm:mb-8 animate-fadeInUp delay-100 text-center">
+            <h2 class="text-2xl sm:text-3xl xl:text-4xl font-bold text-gray-900 mb-2">
+              Bienvenue !
+            </h2>
+            <p class="text-sm sm:text-base text-gray-600">
+              Connectez-vous à votre espace personnel
+            </p>
+          </div>
+
+          <!-- Onglets Email/Téléphone -->
+          <div class="mb-6 sm:mb-8 animate-fadeInUp delay-200">
+            <div class="bg-gray-100 rounded-2xl p-1.5 flex gap-1">
+              <button
+                class="tab-active flex-1 py-3 sm:py-3.5 rounded-xl transition-all duration-300 text-sm sm:text-base font-medium shadow-sm"
+                id="emailTab"
+              >
+                <svg
+                  class="w-5 h-5 inline-block mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  ></path>
+                </svg>
+                Email
+              </button>
+              <button
+                class="tab-inactive flex-1 py-3 sm:py-3.5 rounded-xl transition-all duration-300 text-sm sm:text-base font-medium"
+                id="phoneTab"
+              >
+                <svg
+                  class="w-5 h-5 inline-block mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  ></path>
+                </svg>
+                Téléphone
+              </button>
+            </div>
+          </div>
+
+          <!-- Formulaire Email -->
+          <form class="space-y-5 sm:space-y-6 animate-fadeInUp delay-300" id="emailForm">
+            <!-- Email -->
+            <div class="group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Adresse email</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg
+                    class="w-5 h-5 text-gray-400 input-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                </div>
+                <input
+                  type="email"
+                  placeholder="exemple@email.com"
+                  class="w-full pl-12 pr-4 py-3.5 sm:py-4 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 focus:border-primary focus:ring-4 focus:ring-primary/10"
+                />
+              </div>
+            </div>
+
+            <!-- Mot de passe -->
+            <div class="group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg
+                    class="w-5 h-5 text-gray-400 input-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    ></path>
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  class="w-full pl-12 pr-4 py-3.5 sm:py-4 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 focus:border-primary focus:ring-4 focus:ring-primary/10"
+                />
+              </div>
+            </div>
+
+            <!-- Options -->
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0"
+            >
+              <a
+                href="#"
+                class="text-sm font-medium text-primary hover:text-primary transition-colors"
+              >
+                Mot de passe oublié ?
+              </a>
+            </div>
+
+            <!-- Bouton connexion -->
+            <button
+              type="submit"
+              class="w-full bg-primary hover:bg-primary text-white font-semibold py-3.5 sm:py-4 rounded-xl transition-all duration-300 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+            >
+              Se connecter
+            </button>
+          </form>
+
+          <!-- Formulaire Téléphone (caché par défaut) -->
+          <form class="space-y-5 sm:space-y-6 animate-fadeInUp delay-300 hidden" id="phoneForm">
+            <!-- Téléphone -->
+            <div class="group">
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Numéro de téléphone</label
+              >
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg
+                    class="w-5 h-5 text-gray-400 input-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    ></path>
+                  </svg>
+                </div>
+                <input
+                  type="tel"
+                  placeholder="+221 77 123 45 67"
+                  class="w-full pl-12 pr-4 py-3.5 sm:py-4 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 focus:border-primary focus:ring-4 focus:ring-primary/10"
+                />
+              </div>
+            </div>
+
+            <!-- Code PIN -->
+            <div class="group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Code PIN</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg
+                    class="w-5 h-5 text-gray-400 input-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    ></path>
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  placeholder="••••"
+                  maxlength="4"
+                  class="w-full pl-12 pr-4 py-3.5 sm:py-4 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 transition-all duration-300 focus:border-primary focus:ring-4 focus:ring-primary/10"
+                />
+              </div>
+            </div>
+
+            <!-- Options -->
+            <div
+              class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0"
+            >
+              <a
+                href="#"
+                class="text-sm font-medium text-primary hover:text-primary transition-colors"
+              >
+                Code PIN oublié ?
+              </a>
+            </div>
+
+            <!-- Bouton connexion -->
+            <button
+              type="submit"
+              class="w-full bg-primary hover:bg-primary text-white font-semibold py-3.5 sm:py-4 rounded-xl transition-all duration-300 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+            >
+              Se connecter
+            </button>
+          </form>
+
+          <!-- Inscription -->
+          <div class="mt-6 sm:mt-8 text-center animate-fadeInUp delay-400">
+            <p class="text-sm text-gray-600">
+              Vous n'avez pas de compte ?
+              <a
+                href="#"
+                class="font-semibold text-primary hover:text-primary transition-colors ml-1"
+              >
+                Créer un compte
+              </a>
+            </p>
+          </div>
+
+          <!-- Footer -->
+          <div
+            class="mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-gray-100 animate-fadeInUp delay-400"
+          >
+            <div class="text-xs sm:text-sm text-gray-500 text-center">
+              En vous connectant, vous acceptez nos
+              <a href="#" class="text-primary"> Conditions d'utilisation </a>
+              et
+              <a href="#" class="text-primary">Politique de confidentialité</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Gestion des onglets
+      const emailTab = document.getElementById('emailTab');
+      const phoneTab = document.getElementById('phoneTab');
+      const emailForm = document.getElementById('emailForm');
+      const phoneForm = document.getElementById('phoneForm');
+
+      emailTab.addEventListener('click', () => {
+        emailTab.classList.add('tab-active');
+        emailTab.classList.remove('tab-inactive');
+        phoneTab.classList.add('tab-inactive');
+        phoneTab.classList.remove('tab-active');
+        emailForm.classList.remove('hidden');
+        phoneForm.classList.add('hidden');
+      });
+
+      phoneTab.addEventListener('click', () => {
+        phoneTab.classList.add('tab-active');
+        phoneTab.classList.remove('tab-inactive');
+        emailTab.classList.add('tab-inactive');
+        emailTab.classList.remove('tab-active');
+        phoneForm.classList.remove('hidden');
+        emailForm.classList.add('hidden');
+      });
+    </script>
+  </body>
+</html>

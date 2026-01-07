@@ -10,9 +10,9 @@ import { RouterModule } from '@angular/router';
 })
 export class NavabrComponent {
   navLinks = [
-    { label: 'Accueil', path: '/accueil' },
-    { label: 'Programmes', path: '/programme' },
-    { label: 'Carte Action', path: '/carte-action' },
-    { label: 'Réalisations', path: '/realisations-actualites' },
+    { label: 'Accueil', path: '/public/accueil' },
+    { label: 'Programmes', path: '/public/programme' },
+    { label: 'Carte Action', path: '/public/carte-action' },
+    { label: 'Réalisations', path: '/public/realisations-actualites' },
   ];
 }
