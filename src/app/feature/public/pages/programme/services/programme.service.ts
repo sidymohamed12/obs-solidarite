@@ -22,7 +22,7 @@ export class ProgrammeService {
       category: 'Rural & Services',
       description:
         'Lutter contre l’insécurité alimentaire et renforcer la résilience des populations face aux chocs.',
-      image: 'https://www.csasenegal.com/img/logo%20footer.png',
+      image: 'csa.jpg',
     },
     {
       id: '3',
@@ -30,8 +30,7 @@ export class ProgrammeService {
       category: 'Santé',
       description:
         'Garantir l’accès aux soins via des mutuelles de santé et une prise en charge subventionnée.',
-      image:
-        'https://z-p3-scontent.fdkr5-1.fna.fbcdn.net/v/t39.30808-6/465674145_931112032449458_3902769548327933168_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=4Ri_Qdz7uxUQ7kNvwFMVG2J&_nc_oc=AdmOPwyTCIhWdu0Y-F2crRMwsYKW9L_kBSUiVKMBOcQXviWvRYdO3hapY3YNeHFEtOk&_nc_zt=23&_nc_ht=z-p3-scontent.fdkr5-1.fna&_nc_gid=ksgYridf_YYbLkdEQx7fsQ&oh=00_AfoJiNnAadpSxz6kVt737W8c2BuBlkQlmzq9ftPCmmLS2g&oe=6962EBE2',
+      image: 'csu.jpeg',
     },
     {
       id: '4',
@@ -39,8 +38,7 @@ export class ProgrammeService {
       category: 'Social',
       description:
         'Allocation trimestrielle de 35 000 FCFA pour les ménages vulnérables, conditionnée à la santé et l’éducation.',
-      image:
-        'https://z-p3-scontent.fdkr7-1.fna.fbcdn.net/v/t39.30808-6/292376713_416977727117281_2502780151187679972_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=w1yAcmK3ZykQ7kNvwHSWiEI&_nc_oc=AdmiXzJgva_PrpTtWZ1C0fgRdVTw8fGkK9U3jT9rk9YWsk7jhxPAit2M1qqkL--66AA&_nc_zt=23&_nc_ht=z-p3-scontent.fdkr7-1.fna&_nc_gid=71zYcUKxN1eb6qsr3GM8QA&oh=00_AfqQT0IzFKeTAfHw4PoNAih_Z8x0e6hdSeO5ff2b1HQsPg&oe=6962DB65',
+      image: 'pnbsf.jpg',
     },
     {
       id: '5',
