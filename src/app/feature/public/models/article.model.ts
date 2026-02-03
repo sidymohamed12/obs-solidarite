@@ -5,4 +5,5 @@ export interface Article {
   date?: string;
   title: string;
   description?: string;
+  isFeatured?: boolean;
 }

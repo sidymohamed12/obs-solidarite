@@ -73,7 +73,7 @@
         class="h-1.5 transition-all duration-500 rounded-full"
         [ngClass]="{
           'w-12 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]': currentSlide === i,
-          'w-4 bg-white/40 hover:bg-white/60': currentSlide !== i
+          'w-4 bg-white/40 hover:bg-white/60': currentSlide !== i,
         }"
       ></button>
     </div>
@@ -102,7 +102,7 @@
         class="px-8 py-3 rounded-3xl font-bold transition-all active:scale-95"
         [ngClass]="{
           'bg-white shadow-lg shadow-slate-200 text-slate-900': activeFilter === 'all',
-          'text-slate-500 hover:text-slate-900': activeFilter !== 'all'
+          'text-slate-500 hover:text-slate-900': activeFilter !== 'all',
         }"
       >
         Tout voir
@@ -112,7 +112,7 @@
         class="px-8 py-3 rounded-3xl font-bold transition-all"
         [ngClass]="{
           'bg-white shadow-lg shadow-slate-200 text-slate-900': activeFilter === 'actualite',
-          'text-slate-500 hover:text-slate-900': activeFilter !== 'actualite'
+          'text-slate-500 hover:text-slate-900': activeFilter !== 'actualite',
         }"
       >
         Actualités
@@ -122,7 +122,7 @@
         class="px-8 py-3 rounded-3xl font-bold transition-all"
         [ngClass]="{
           'bg-white shadow-lg shadow-slate-200 text-slate-900': activeFilter === 'realisation',
-          'text-slate-500 hover:text-slate-900': activeFilter !== 'realisation'
+          'text-slate-500 hover:text-slate-900': activeFilter !== 'realisation',
         }"
       >
         Réalisations
@@ -135,53 +135,53 @@
 <main class="w-full mx-auto px-6 lg:px-20 pb-32">
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
     @for (article of articles; track $index) {
-    <!-- Regular News Article -->
-    <article
-      (click)="onArticleClick(article)"
-      class="group p-6 rounded-[2.5rem] bg-slate-50 transition-all duration-500 cursor-pointer flex flex-col h-full"
-    >
-      <div class="relative aspect-video overflow-hidden rounded-[1.8rem] mb-6 shadow-sm">
-        <img
-          [src]="article.image"
-          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          [alt]="article.title"
-        />
-        <span
-          class="absolute top-4 left-4 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full text-[10px] font-black text-emerald-700 uppercase"
-        >
-          {{ article.type }}
-        </span>
-      </div>
-
-      <div class="flex flex-col grow">
-        <div
-          class="flex items-center gap-2 text-primary text-[10px] font-bold uppercase tracking-widest mb-4 italic"
-        >
-          <span class="w-8 h-px bg-primary"></span> {{ article.date }}
+      <!-- Regular News Article -->
+      <article
+        (click)="onArticleClick(article)"
+        class="group p-6 rounded-[2.5rem] bg-slate-100 transition-all duration-500 cursor-pointer flex flex-col h-full"
+      >
+        <div class="relative aspect-video overflow-hidden rounded-[1.8rem] mb-6 shadow-sm">
+          <img
+            [src]="article.image"
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            [alt]="article.title"
+          />
+          <span
+            class="absolute top-4 left-4 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full text-[10px] font-black text-emerald-700 uppercase"
+          >
+            {{ article.type }}
+          </span>
         </div>
 
-        <h3
-          class="text-xl font-extrabold text-slate-900 mb-3 leading-tight group-hover:text-emerald-700"
-        >
-          {{ article.title }}
-        </h3>
-
-        <p class="text-slate-600 text-sm line-clamp-2 mb-6">
-          {{ article.description }}
-        </p>
-
-        <div
-          class="mt-auto flex items-center justify-between group-hover:text-emerald-600 transition-colors"
-        >
-          <span class="text-sm font-bold">Lire la suite</span>
+        <div class="flex flex-col grow">
           <div
-            class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-all"
+            class="flex items-center gap-2 text-primary text-[10px] font-bold uppercase tracking-widest mb-4 italic"
           >
-            <i class="fas fa-arrow-right text-xs"></i>
+            <span class="w-8 h-px bg-primary"></span> {{ article.date }}
+          </div>
+
+          <h3
+            class="text-xl font-extrabold text-slate-900 mb-3 leading-tight group-hover:text-emerald-700"
+          >
+            {{ article.title }}
+          </h3>
+
+          <p class="text-slate-600 text-sm line-clamp-2 mb-6">
+            {{ article.description }}
+          </p>
+
+          <div
+            class="mt-auto flex items-center justify-between group-hover:text-emerald-600 transition-colors"
+          >
+            <span class="text-sm font-bold">Lire la suite</span>
+            <div
+              class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-all"
+            >
+              <i class="fas fa-arrow-right text-xs"></i>
+            </div>
           </div>
         </div>
-      </div>
-    </article>
+      </article>
     }
   </div>
   <div class="mt-16 flex items-center justify-center gap-2">

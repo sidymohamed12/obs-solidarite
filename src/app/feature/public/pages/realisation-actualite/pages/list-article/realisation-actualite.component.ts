@@ -32,7 +32,7 @@ export class RealisationActualiteComponent implements OnInit, OnDestroy {
       image:
         'https://devcommunautaire.gouv.sn/sites/default/files/gbb-uploads/Plan%20de%20travail%2048.png',
       badge: 'Santé Publique',
-      title: 'Caravane Médicale : 15 régions.',
+      title: 'Caravane Médicale : 14 régions.',
       description:
         "Plus de 10 000 consultations gratuites réalisées ce mois-ci pour garantir l'accès aux soins.",
     },

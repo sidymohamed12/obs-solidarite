@@ -12,7 +12,7 @@
           [ngClass]="{
             'bg-emerald-600 text-white ring-8 ring-emerald-50': currentStep === i + 1,
             'bg-emerald-500 text-white': currentStep > i + 1,
-            'bg-white border-2 border-slate-200 text-slate-400': currentStep < i + 1
+            'bg-white border-2 border-slate-200 text-slate-400': currentStep < i + 1,
           }"
           class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-500"
         >
@@ -55,7 +55,7 @@
               name="firstName"
               placeholder="Ex: Moussa"
               [ngClass]="{
-                'border-red-500 bg-red-50': f['firstName'].touched && f['firstName'].invalid
+                'border-red-500 bg-red-50': f['firstName'].touched && f['firstName'].invalid,
               }"
               class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-emerald-500 outline-none transition-all"
             />
@@ -77,7 +77,7 @@
               name="lastName"
               placeholder="Ex: Diagne"
               [ngClass]="{
-                'border-red-500 bg-red-50': f['lastName'].touched && f['lastName'].invalid
+                'border-red-500 bg-red-50': f['lastName'].touched && f['lastName'].invalid,
               }"
               class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-emerald-500 outline-none transition-all"
             />
@@ -160,7 +160,7 @@
               formControlName="commune"
               placeholder="Ex: Rufisque Est"
               [ngClass]="{
-                'border-red-500 bg-red-50': f['commune'].touched && f['commune'].invalid
+                'border-red-500 bg-red-50': f['commune'].touched && f['commune'].invalid,
               }"
               class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-emerald-500 outline-none transition-all"
             />
@@ -190,14 +190,14 @@
               formControlName="programme"
               name="programme"
               [ngClass]="{
-                'border-red-500 bg-red-50': f['programme'].touched && f['programme'].invalid
+                'border-red-500 bg-red-50': f['programme'].touched && f['programme'].invalid,
               }"
               class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:border-emerald-500 outline-none"
             >
               <option value="" disabled>Choisir un programme...</option>
               <option value="pnbsf">Bourse de Sécurité Familiale (PNBSF)</option>
               <option value="ce">Carte d’Égalité des Chances (CEC)</option>
-              <option value="cmu">Couverture Maladie Universelle (CMU)</option>
+              <option value="csu">Couverture Sanitaire Universelle (CSU)</option>
               <option value="urgence">Secours Exceptionnel</option>
             </select>
             <p
