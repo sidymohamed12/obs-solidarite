@@ -6,6 +6,7 @@ import { Region, RegionData } from '../../../models/region.model';
   providedIn: 'root',
 })
 export class RegionService {
+  // --- Configuration des régions pour la Carte ---
   private readonly regions: Region[] = [
     {
       name: 'Dakar',
@@ -42,8 +43,44 @@ export class RegionService {
       color: '#ef4444',
       beneficiaries: '12,876',
     },
+    {
+      name: 'Louga',
+      pos: [15.6186, -16.2243],
+      count: 112,
+      color: '#f97316',
+      beneficiaries: '15,430',
+    },
+    {
+      name: 'Diourbel',
+      pos: [14.65, -16.2333],
+      count: 134,
+      color: '#06b6d4',
+      beneficiaries: '18,120',
+    },
+    {
+      name: 'Tambacounda',
+      pos: [13.7707, -13.6673],
+      count: 95,
+      color: '#8b5cf6',
+      beneficiaries: '10,245',
+    },
+    {
+      name: 'Matam',
+      pos: [15.6559, -13.2554],
+      count: 76,
+      color: '#ec4899',
+      beneficiaries: '8,900',
+    },
+    {
+      name: 'Kolda',
+      pos: [12.8833, -14.95],
+      count: 68,
+      color: '#10b981',
+      beneficiaries: '7,450',
+    },
   ];
 
+  // --- Données détaillées par Région (Classement) ---
   private readonly regionsData: RegionData[] = [
     {
       rank: 1,
@@ -92,6 +129,39 @@ export class RegionService {
     },
     {
       rank: 5,
+      name: 'Diourbel',
+      subtitle: 'Région centre-ouest',
+      actions: 134,
+      beneficiaries: '18,120',
+      programs: 10,
+      progress: 55,
+      progressChange: '+4%',
+      progressColor: 'yellow',
+    },
+    {
+      rank: 6,
+      name: 'Louga',
+      subtitle: 'Région nord-ouest',
+      actions: 112,
+      beneficiaries: '15,430',
+      programs: 9,
+      progress: 52,
+      progressChange: '+6%',
+      progressColor: 'yellow',
+    },
+    {
+      rank: 7,
+      name: 'Tambacounda',
+      subtitle: 'Région est',
+      actions: 95,
+      beneficiaries: '10,245',
+      programs: 8,
+      progress: 48,
+      progressChange: '+4%',
+      progressColor: 'blue',
+    },
+    {
+      rank: 8,
       name: 'Ziguinchor',
       subtitle: 'Région sud',
       actions: 89,

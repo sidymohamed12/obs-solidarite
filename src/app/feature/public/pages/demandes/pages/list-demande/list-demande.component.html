@@ -142,7 +142,7 @@
                   'bg-emerald-600 text-white': getStepFromStatus(selectedDemande.statut) > 2,
                   'border-4 border-emerald-600 text-emerald-600 animate-pulse bg-white':
                     getStepFromStatus(selectedDemande.statut) === 2,
-                  'bg-gray-100 text-gray-400': getStepFromStatus(selectedDemande.statut) < 2
+                  'bg-gray-100 text-gray-400': getStepFromStatus(selectedDemande.statut) < 2,
                 }"
                 class="w-12 h-12 rounded-full flex items-center justify-center ring-8 ring-white"
               >
@@ -184,13 +184,16 @@
 
       <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
         <h3 class="font-bold text-lg mb-4">Documents transmis</h3>
+
         <div
           *ngIf="selectedDemande.documents.length > 0; else noDocs"
           class="grid grid-cols-1 sm:grid-cols-2 gap-4"
         >
-          <div
+          <a
             *ngFor="let doc of selectedDemande.documents"
-            class="flex items-center justify-between p-4 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all group"
+            [href]="'realisations/' + doc"
+            target="_blank"
+            class="flex items-center justify-between p-4 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all group cursor-pointer"
           >
             <div class="flex items-center gap-3">
               <i
@@ -203,9 +206,13 @@
                 <span class="text-xs text-gray-400">{{ getFileType(doc) }}</span>
               </div>
             </div>
-            <i class="fas fa-check-circle text-emerald-500"></i>
-          </div>
+
+            <i
+              class="fas fa-external-link-alt text-gray-300 group-hover:text-blue-500 transition-colors text-xs"
+            ></i>
+          </a>
         </div>
+
         <ng-template #noDocs>
           <p class="text-gray-400 italic text-sm text-center py-4">Aucun document transmis.</p>
         </ng-template>

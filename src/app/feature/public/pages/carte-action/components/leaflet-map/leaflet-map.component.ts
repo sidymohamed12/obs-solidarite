@@ -1,6 +1,7 @@
 // src/app/components/leaflet-map/leaflet-map.component.ts
 import { Component, OnInit, OnDestroy, AfterViewInit, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { RegionService } from '../../services/region.service';
 
 export interface Region {
   name: string;
@@ -22,49 +23,18 @@ export class LeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly defaultZoom = 7;
   private readonly isBrowser: boolean;
 
-  regions: Region[] = [
-    {
-      name: 'Dakar',
-      pos: [14.7167, -17.4677],
-      count: 324,
-      color: '#22c55e',
-      beneficiaries: '45,892',
-    },
-    {
-      name: 'Thiès',
-      pos: [14.791, -16.9359],
-      count: 198,
-      color: '#eab308',
-      beneficiaries: '28,341',
-    },
-    {
-      name: 'Saint-Louis',
-      pos: [16.0179, -16.4896],
-      count: 156,
-      color: '#3b82f6',
-      beneficiaries: '21,567',
-    },
-    {
-      name: 'Kaolack',
-      pos: [14.1442, -16.0833],
-      count: 142,
-      color: '#a855f7',
-      beneficiaries: '19,234',
-    },
-    {
-      name: 'Ziguinchor',
-      pos: [12.5833, -16.2719],
-      count: 89,
-      color: '#ef4444',
-      beneficiaries: '12,876',
-    },
-  ];
+  regions: Region[] = [];
 
-  constructor(@Inject(PLATFORM_ID) private readonly platformId: Object) {
+  constructor(
+    @Inject(PLATFORM_ID) private readonly platformId: Object,
+    private readonly regionService: RegionService,
+  ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadRegions();
+  }
 
   async ngAfterViewInit(): Promise<void> {
     if (this.isBrowser) {
@@ -79,6 +49,13 @@ export class LeafletMapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.map) {
       this.map.remove();
     }
+  }
+
+  loadRegions(): void {
+    this.regionService.getRegions().subscribe((regions) => {
+      this.regions = regions;
+      this.addMarkers();
+    });
   }
 
   private initMap(): void {

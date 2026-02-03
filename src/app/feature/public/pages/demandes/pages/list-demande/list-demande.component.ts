@@ -25,7 +25,7 @@ export class ListDemandeComponent {
       type: 'Bourse Familiale',
       dateDepot: '2025-12-12',
       statut: 'en_cours',
-      documents: ['CNI.pdf', 'Certificat_Vie.jpg'],
+      documents: ['CNI.pdf', 'kdo-bb.jpg'],
     },
     {
       id: 'TX-2024-0550',
@@ -44,7 +44,7 @@ export class ListDemandeComponent {
     if (!this.searchId.trim()) return;
 
     const dossierTrouve = this.demandes.find(
-      (d) => d.id.toLowerCase() === this.searchId.trim().toLowerCase()
+      (d) => d.id.toLowerCase() === this.searchId.trim().toLowerCase(),
     );
 
     if (dossierTrouve) {

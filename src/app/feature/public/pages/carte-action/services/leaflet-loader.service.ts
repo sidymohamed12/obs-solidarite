@@ -8,7 +8,7 @@ export class LeafletLoaderService {
   private leafletLoaded = false;
   private leafletInstance: any = null;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private readonly platformId: Object) {}
 
   async loadLeaflet(): Promise<any> {
     if (!isPlatformBrowser(this.platformId)) {
