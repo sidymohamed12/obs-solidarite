@@ -174,10 +174,10 @@
         <!-- Formulaire Email -->
         <form
           *ngIf="loginMethod === 'email'"
+          [formGroup]="emailForm"
           (ngSubmit)="onLogin()"
           class="space-y-4 xs:space-y-5 sm:space-y-6 md:space-y-6 xl:space-y-7 2xl:space-y-8 animate-fadeInUp delay-300"
         >
-          <!-- Champ Email -->
           <div class="group">
             <label
               for="email"
@@ -193,14 +193,16 @@
               </div>
               <input
                 type="email"
-                name="email"
+                formControlName="email"
                 placeholder="exemple@email.com"
                 class="w-full pl-10 xs:pl-11 sm:pl-12 pr-3 xs:pr-3.5 sm:pr-4 py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
+                [class.border-red-500]="
+                  emailForm.get('email')?.invalid && emailForm.get('email')?.touched
+                "
               />
             </div>
           </div>
 
-          <!-- Champ Mot de passe -->
           <div class="group">
             <label
               for="password"
@@ -228,29 +230,31 @@
               </div>
               <input
                 type="password"
-                name="password"
+                formControlName="password"
                 placeholder="••••••••"
                 class="w-full pl-10 xs:pl-11 sm:pl-12 pr-3 xs:pr-3.5 sm:pr-4 py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
+                [class.border-red-500]="
+                  emailForm.get('password')?.invalid && emailForm.get('password')?.touched
+                "
               />
             </div>
           </div>
 
-          <!-- Bouton de connexion -->
           <button
             type="submit"
-            class="w-full bg-[#047857] hover:bg-emerald-700 text-white font-semibold py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+            [disabled]="emailForm.invalid"
+            class="w-full bg-[#047857] hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
           >
             Se connecter
           </button>
         </form>
 
-        <!-- Formulaire Téléphone -->
         <form
           *ngIf="loginMethod === 'phone'"
+          [formGroup]="phoneForm"
           (ngSubmit)="onLogin()"
           class="space-y-4 xs:space-y-5 sm:space-y-6 md:space-y-6 xl:space-y-7 2xl:space-y-8 animate-fadeInUp delay-300"
         >
-          <!-- Champ Téléphone -->
           <div class="group">
             <label
               for="phone"
@@ -278,14 +282,16 @@
               </div>
               <input
                 type="tel"
-                name="phone"
+                formControlName="phone"
                 placeholder="+221 77 123 45 67"
                 class="w-full pl-10 xs:pl-11 sm:pl-12 pr-3 xs:pr-3.5 sm:pr-4 py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
+                [class.border-red-500]="
+                  phoneForm.get('phone')?.invalid && phoneForm.get('phone')?.touched
+                "
               />
             </div>
           </div>
 
-          <!-- Champ Code PIN -->
           <div class="group">
             <label
               for="pin"
@@ -313,18 +319,21 @@
               </div>
               <input
                 type="password"
-                name="pin"
+                formControlName="pin"
                 maxlength="4"
                 placeholder="••••"
                 class="w-full pl-10 xs:pl-11 sm:pl-12 pr-3 xs:pr-3.5 sm:pr-4 py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
+                [class.border-red-500]="
+                  phoneForm.get('pin')?.invalid && phoneForm.get('pin')?.touched
+                "
               />
             </div>
           </div>
 
-          <!-- Bouton de connexion -->
           <button
             type="submit"
-            class="w-full bg-[#047857] hover:bg-emerald-700 text-white font-semibold py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+            [disabled]="phoneForm.invalid"
+            class="w-full bg-[#047857] hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
           >
             Se connecter
           </button>
