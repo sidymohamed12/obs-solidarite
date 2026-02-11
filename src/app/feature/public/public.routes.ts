@@ -13,12 +13,12 @@ export const PUBLIC_ROUTES: Routes = [
     component: PublicLayoutComponent,
     children: [
       { path: '', redirectTo: 'accueil', pathMatch: 'full' },
-      { path: 'accueil', component: AccueilComponent, title: 'Accueil' },
-      { path: 'programme', component: ProgrammeComponent, title: 'Programmes' },
+      { path: 'accueil', component: AccueilComponent },
+      { path: 'programme', component: ProgrammeComponent },
       // { path: 'programme/:id', component: ProgrammeComponent, title: 'Programmes' },
-      { path: 'carte-action', component: CarteActionComponent, title: 'Carte Action' },
-      { path: 'add-demande', component: AddDemandeComponent, title: 'Déposer une demande' },
-      { path: 'demandes', component: ListDemandeComponent, title: 'Mes Demandes' },
+      { path: 'carte-action', component: CarteActionComponent },
+      { path: 'add-demande', component: AddDemandeComponent },
+      { path: 'demandes', component: ListDemandeComponent },
       {
         path: 'realisations-actualites',
         component: RealisationActualiteComponent,
