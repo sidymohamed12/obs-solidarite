@@ -29,16 +29,24 @@
     <div class="flex items-center gap-4">
       <button
         routerLink="/auth/public/login"
-        class="hidden md:block text-slate-600 font-medium hover:text-primary transition"
+        class="text-slate-600 font-medium hover:text-primary transition"
       >
         Connexion
       </button>
+      <button
+        routerLink="/auth/public/logout"
+        class="text-slate-600 font-medium hover:text-primary transition"
+      >
+        Déconnexion
+      </button>
+      @if (auth.isAuthenticated()) {
       <button
         routerLink="/public/demandes"
         class="bg-primary text-white px-5 py-2 rounded-full hover:bg-opacity-90 transition"
       >
         Mes demandes
       </button>
+      }
     </div>
   </div>
 </nav>

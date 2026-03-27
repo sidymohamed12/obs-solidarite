@@ -1,61 +1,69 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { LoginEmailRequest, LoginPhoneRequest } from '../../../../../../core/auth/models/auth.models';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
-  private readonly router = inject(Router);
+  protected readonly auth = inject(AuthService);
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
 
   loginMethod: 'email' | 'phone' = 'email';
+  registeredMessage = signal<string | null>(null);
 
-  // Définition des formulaires
   emailForm!: FormGroup;
   phoneForm!: FormGroup;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.initForms();
+    // Message de succès après inscription
+    const registered = this.route.snapshot.queryParamMap.get('registered');
+    const msg = this.route.snapshot.queryParamMap.get('message');
+    if (registered === 'true') {
+      this.registeredMessage.set(msg ?? 'Compte créé avec succès. Connectez-vous.');
+    }
   }
 
-  private initForms() {
-    // Formulaire Email
+  private initForms(): void {
     this.emailForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(4)]],
     });
 
-    // Formulaire Téléphone
     this.phoneForm = this.fb.group({
-      phone: ['', [Validators.required, Validators.pattern('^[0-9+ ]*$')]],
-      pin: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(4)]],
+      phone: ['', [Validators.required, Validators.pattern('^\\+?[0-9 ]{8,15}$')]],
+      pin: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern('^[0-9]+$')]],
     });
   }
 
-  setLoginMethod(method: 'email' | 'phone') {
+  setLoginMethod(method: 'email' | 'phone'): void {
     this.loginMethod = method;
+    this.auth.clearError();
   }
 
-  onLogin() {
+  onLogin(): void {
     if (this.loginMethod === 'email') {
-      if (this.emailForm.valid) {
-        console.log('Données Email:', this.emailForm.value);
-        this.router.navigate(['/public']);
-      } else {
-        this.emailForm.markAllAsTouched();
-      }
+      if (this.emailForm.invalid) { this.emailForm.markAllAsTouched(); return; }
+      const payload: LoginEmailRequest = {
+        email: this.emailForm.value.email,
+        password: this.emailForm.value.password,
+      };
+      this.auth.login(payload);
     } else {
-      if (this.phoneForm.valid) {
-        console.log('Données Téléphone:', this.phoneForm.value);
-        this.router.navigate(['/public']);
-      } else {
-        this.phoneForm.markAllAsTouched();
-      }
+      if (this.phoneForm.invalid) { this.phoneForm.markAllAsTouched(); return; }
+      const payload: LoginPhoneRequest = {
+        phoneNumber: this.phoneForm.value.phone,
+        codePin: this.phoneForm.value.pin,
+      };
+      this.auth.login(payload);
     }
   }
 }

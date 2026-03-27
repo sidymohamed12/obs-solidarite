@@ -1,0 +1,26 @@
+<section *ngIf="loading" class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+  <div class="rounded-[2rem] border border-slate-100 bg-white px-6 py-10 text-center text-slate-500">
+    Chargement de la demande...
+  </div>
+</section>
+
+<div *ngIf="!loading" class="space-y-4">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-8">
+    <a *ngIf="demandeId" [routerLink]="['/public/demandes', demandeId]" class="inline-flex items-center rounded-2xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
+      Retour au détail
+    </a>
+  </div>
+
+  <app-demande-form
+    title="Modifier une demande"
+    subtitle="Les mises à jour utilisent aussi FormData et la clé piecesJointes pour les nouveaux fichiers."
+    submitLabel="Enregistrer les modifications"
+    [programmes]="programmes"
+    [initialValue]="initialValue"
+    [existingDocuments]="existingDocuments"
+    [submitting]="submitting"
+    [errorMessage]="errorMessage"
+    (formSubmitted)="submit($event)"
+    (downloadDocument)="downloadDocument($event)"
+  ></app-demande-form>
+</div>

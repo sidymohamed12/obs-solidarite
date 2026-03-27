@@ -6,6 +6,8 @@ import { CarteActionComponent } from './pages/carte-action/carte-action.componen
 import { RealisationActualiteComponent } from './pages/realisation-actualite/pages/list-article/realisation-actualite.component';
 import { AddDemandeComponent } from './pages/demandes/pages/add-demande/add-demande.component';
 import { ListDemandeComponent } from './pages/demandes/pages/list-demande/list-demande.component';
+import { DetailDemandeComponent } from './pages/demandes/pages/detail-demande/detail-demande.component';
+import { UpdateDemandeComponent } from './pages/demandes/pages/update-demande/update-demande.component';
 
 export const PUBLIC_ROUTES: Routes = [
   {
@@ -17,8 +19,11 @@ export const PUBLIC_ROUTES: Routes = [
       { path: 'programme', component: ProgrammeComponent },
       // { path: 'programme/:id', component: ProgrammeComponent, title: 'Programmes' },
       { path: 'carte-action', component: CarteActionComponent },
-      { path: 'add-demande', component: AddDemandeComponent },
       { path: 'demandes', component: ListDemandeComponent },
+      { path: 'demandes/nouveau', component: AddDemandeComponent },
+      { path: 'demandes/:id/modifier', component: UpdateDemandeComponent },
+      { path: 'demandes/:id', component: DetailDemandeComponent },
+      { path: 'add-demande', redirectTo: 'demandes/nouveau', pathMatch: 'full' },
       {
         path: 'realisations-actualites',
         component: RealisationActualiteComponent,

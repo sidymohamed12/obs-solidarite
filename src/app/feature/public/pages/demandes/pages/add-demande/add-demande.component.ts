@@ -1,116 +1,78 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
+import { DemandeFormComponent } from '../../components/demande-form/demande-form.component';
+import { DemandePayload, DemandeProgrammeOption } from '../../models/demande.model';
+import { DemandesApiService } from '../../services/demandes-api.service';
+import { ProgrammeService } from '../../../programme/services/programme.service';
 
 @Component({
   selector: 'app-add-demande',
-  imports: [ReactiveFormsModule, CommonModule],
+  standalone: true,
+  imports: [CommonModule, DemandeFormComponent],
   templateUrl: './add-demande.component.html',
   styleUrl: './add-demande.component.css',
 })
-export class AddDemandeComponent {
-  registrationForm: FormGroup;
-  currentStep = 1;
-  totalSteps = 3;
-  isSubmitted = false;
-  uploadedFiles: File[] = [];
+export class AddDemandeComponent implements OnInit {
+  private readonly demandesApi = inject(DemandesApiService);
+  private readonly programmeService = inject(ProgrammeService);
+  private readonly router = inject(Router);
 
-  regions = [
-    'Dakar',
-    'Diourbel',
-    'Fatick',
-    'Kaffrine',
-    'Kaolack',
-    'Kédougou',
-    'Kolda',
-    'Louga',
-    'Matam',
-    'Saint-Louis',
-    'Sédhiou',
-    'Tambacounda',
-    'Thiès',
-    'Ziguinchor',
-  ];
+  protected programmes: DemandeProgrammeOption[] = [];
+  protected loading = false;
+  protected submitting = false;
+  protected errorMessage: string | null = null;
 
-  constructor(private readonly fb: FormBuilder) {
-    this.registrationForm = this.fb.group({
-      // Étape 1 : Identité
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
-      phone: ['', [Validators.required, Validators.pattern('^(77|78|70|76|75)[0-9]{7}$')]],
-      cin: ['', [Validators.required, Validators.pattern('^[0-9]{13,15}$')]],
-      region: ['', Validators.required],
-      commune: ['', Validators.required],
-
-      // Étape 2 : Besoin
-      programme: ['', Validators.required],
-      motif: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
-
-      // Étape 3 : Documents
-      hasFiles: [false, Validators.requiredTrue],
-    });
+  ngOnInit(): void {
+    this.loadProgrammes();
   }
 
-  // Accès facile aux contrôles
-  get f() {
-    return this.registrationForm.controls;
+  protected submit(payload: DemandePayload): void {
+    this.submitting = true;
+    this.errorMessage = null;
+
+    this.demandesApi
+      .createDemande(payload)
+      .pipe(finalize(() => (this.submitting = false)))
+      .subscribe({
+        next: (demande) => {
+          this.router.navigate(['/public/demandes', demande.id], {
+            queryParams: { message: 'Demande créée avec succès.' },
+          });
+        },
+        error: (error) => {
+          this.errorMessage = this.extractError(error);
+        },
+      });
   }
 
-  nextStep() {
-    if (this.isStepValid(this.currentStep)) {
-      if (this.currentStep < this.totalSteps) {
-        this.currentStep++;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        this.submit();
-      }
-    } else {
-      this.markStepAsTouched(this.currentStep);
+  private loadProgrammes(): void {
+    this.loading = true;
+    this.programmeService
+      .getPrograms()
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (programmes) => {
+          this.programmes = programmes
+            .map((programme) => ({
+              id: Number(programme.id),
+              label: programme.titre,
+            }))
+            .filter((programme) => Number.isFinite(programme.id));
+        },
+        error: (error) => {
+          this.errorMessage = this.extractError(error);
+        },
+      });
+  }
+
+  private extractError(error: unknown): string {
+    if (error && typeof error === 'object' && 'error' in error) {
+      const httpError = error as { error?: { message?: string }; message?: string };
+      return httpError.error?.message ?? httpError.message ?? 'Une erreur est survenue.';
     }
-  }
 
-  prevStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-    }
-  }
-
-  isStepValid(step: number): boolean {
-    const fields = this.getFieldsByStep(step);
-    return fields.every((field) => this.registrationForm.get(field)?.valid);
-  }
-
-  markStepAsTouched(step: number) {
-    const fields = this.getFieldsByStep(step);
-    fields.forEach((field) => this.registrationForm.get(field)?.markAsTouched());
-  }
-
-  private getFieldsByStep(step: number): string[] {
-    if (step === 1) return ['firstName', 'lastName', 'phone', 'cin', 'region', 'commune'];
-    if (step === 2) return ['programme', 'motif'];
-    if (step === 3) return ['hasFiles'];
-    return [];
-  }
-
-  onFileChange(event: any) {
-    const files = event.target.files as File[];
-    if (files.length > 0) {
-      this.uploadedFiles = [...this.uploadedFiles, ...files];
-      this.registrationForm.patchValue({ hasFiles: true });
-    }
-  }
-
-  removeFile(index: number) {
-    this.uploadedFiles.splice(index, 1);
-    if (this.uploadedFiles.length === 0) {
-      this.registrationForm.patchValue({ hasFiles: false });
-    }
-  }
-
-  submit() {
-    if (this.registrationForm.valid) {
-      this.isSubmitted = true;
-      console.log('Données envoyées :', this.registrationForm.value);
-    }
+    return 'Une erreur est survenue.';
   }
 }

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-navabr',
@@ -9,6 +10,8 @@ import { RouterModule } from '@angular/router';
   styleUrl: './navabr.component.css',
 })
 export class NavabrComponent {
+  protected readonly auth = inject(AuthService);
+
   navLinks = [
     { label: 'Accueil', path: '/public/accueil' },
     { label: 'Programmes', path: '/public/programme' },

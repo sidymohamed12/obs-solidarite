@@ -122,6 +122,28 @@
           </p>
         </div>
 
+        <!-- Bannière de succès (après inscription) -->
+        <div
+          *ngIf="registeredMessage()"
+          class="mb-5 xs:mb-6 flex items-start gap-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl p-3 xs:p-4 text-xs xs:text-sm"
+        >
+          <svg class="w-4 h-4 xs:w-5 xs:h-5 shrink-0 mt-0.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>{{ registeredMessage() }}</span>
+        </div>
+
+        <!-- Bannière d'erreur -->
+        <div
+          *ngIf="auth.error()"
+          class="mb-5 xs:mb-6 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 xs:p-4 text-xs xs:text-sm"
+        >
+          <svg class="w-4 h-4 xs:w-5 xs:h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>{{ auth.error() }}</span>
+        </div>
+
         <!-- Onglets Email/Téléphone -->
         <div class="mb-5 xs:mb-6 sm:mb-7 md:mb-8 animate-fadeInUp delay-200">
           <div class="bg-gray-100 rounded-xl sm:rounded-2xl p-1 sm:p-1.5">
@@ -242,10 +264,14 @@
 
           <button
             type="submit"
-            [disabled]="emailForm.invalid"
-            class="w-full bg-[#047857] hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
+            [disabled]="emailForm.invalid || auth.loading()"
+            class="w-full bg-[#047857] hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2"
           >
-            Se connecter
+            <svg *ngIf="auth.loading()" class="animate-spin w-4 h-4 xs:w-5 xs:h-5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            <span>{{ auth.loading() ? 'Connexion...' : 'Se connecter' }}</span>
           </button>
         </form>
 
@@ -332,10 +358,14 @@
 
           <button
             type="submit"
-            [disabled]="phoneForm.invalid"
-            class="w-full bg-[#047857] hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
+            [disabled]="phoneForm.invalid || auth.loading()"
+            class="w-full bg-[#047857] hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 xs:py-3 sm:py-3.5 md:py-4 xl:py-4 2xl:py-5 text-sm xs:text-base sm:text-base xl:text-lg rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2"
           >
-            Se connecter
+            <svg *ngIf="auth.loading()" class="animate-spin w-4 h-4 xs:w-5 xs:h-5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            <span>{{ auth.loading() ? 'Connexion...' : 'Se connecter' }}</span>
           </button>
         </form>
 
@@ -344,7 +374,7 @@
           <p class="text-xs xs:text-sm sm:text-base xl:text-base text-gray-600">
             Vous n'avez pas de compte ?
             <a
-              href="#"
+              routerLink="/auth/public/register"
               class="font-semibold text-[#047857] hover:text-emerald-700 transition-colors ml-1"
             >
               Créer un compte
