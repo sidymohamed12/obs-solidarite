@@ -87,6 +87,23 @@ export const DEMANDE_REGIONS = [
   'Ziguinchor',
 ];
 
+export const DEMANDE_COMMUNES_BY_REGION: Record<string, string[]> = {
+  Dakar: ['Dakar Plateau', 'Parcelles Assainies', 'Rufisque Est', 'Guédiawaye'],
+  Diourbel: ['Diourbel', 'Bambey', 'Mbacké', 'Touba Mosquée'],
+  Fatick: ['Fatick', 'Foundiougne', 'Gossas', 'Toubacouta'],
+  Kaffrine: ['Kaffrine', 'Birkilane', 'Koungheul', 'Malem Hodar'],
+  Kaolack: ['Kaolack', 'Guinguinéo', 'Nioro du Rip', 'Kahone'],
+  Kédougou: ['Kédougou', 'Salémata', 'Saraya', 'Bandafassi'],
+  Kolda: ['Kolda', 'Médina Yoro Foulah', 'Vélingara', 'Dabo'],
+  Louga: ['Louga', 'Kébémer', 'Linguère', 'Sakal'],
+  Matam: ['Matam', 'Kanel', 'Ranérou', 'Ourossogui'],
+  'Saint-Louis': ['Saint-Louis', 'Dagana', 'Podor', 'Richard-Toll'],
+  Sédhiou: ['Sédhiou', 'Bounkiling', 'Goudomp', 'Diannah Malary'],
+  Tambacounda: ['Tambacounda', 'Bakel', 'Goudiry', 'Koumpentoum'],
+  'Thiès': ['Thiès Nord', 'Mbour', 'Tivaouane', 'Joal-Fadiouth'],
+  Ziguinchor: ['Ziguinchor', 'Bignona', 'Oussouye', 'Thionck Essyl'],
+};
+
 const STATUS_LABELS: Record<string, string> = {
   EN_ATTENTE: 'En attente',
   EN_COURS: 'En cours',

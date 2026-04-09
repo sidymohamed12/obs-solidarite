@@ -61,12 +61,13 @@
             <input
               type="text"
               formControlName="prenom"
+              (input)="sanitizeLettersField('prenom', $event)"
               placeholder="Ex: Moussa"
               [ngClass]="fieldInvalid('prenom') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
               class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all"
             />
             <p *ngIf="fieldInvalid('prenom')" class="text-red-500 text-[11px] font-bold ml-1">
-              Prénom requis (min. 2 caractères).
+              Le prénom doit contenir uniquement des lettres.
             </p>
           </div>
 
@@ -75,12 +76,13 @@
             <input
               type="text"
               formControlName="nom"
+              (input)="sanitizeLettersField('nom', $event)"
               placeholder="Ex: Diagne"
               [ngClass]="fieldInvalid('nom') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
               class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all"
             />
             <p *ngIf="fieldInvalid('nom')" class="text-red-500 text-[11px] font-bold ml-1">
-              Nom requis.
+              Le nom doit contenir uniquement des lettres.
             </p>
           </div>
 
@@ -93,27 +95,48 @@
               <input
                 type="tel"
                 formControlName="telephone"
-                placeholder="77 000 00 00"
+                (input)="sanitizeDigitsField('telephone', 9, $event)"
+                placeholder="770000000"
                 [ngClass]="fieldInvalid('telephone') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
                 class="w-full pl-20 pr-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all"
               />
             </div>
             <p *ngIf="fieldInvalid('telephone')" class="text-red-500 text-[11px] font-bold ml-1">
-              Numéro valide requis.
+              Le téléphone doit contenir exactement 9 chiffres.
             </p>
           </div>
 
           <div class="space-y-2">
-            <label class="text-xs font-black uppercase text-slate-500 ml-1">Numéro CIN / NIN</label>
+            <label class="text-xs font-black uppercase text-slate-500 ml-1">Pièce d'identité</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label
+                *ngFor="let documentType of identityDocumentTypes"
+                class="flex items-center justify-center rounded-2xl border px-4 py-3 text-sm font-bold transition-all cursor-pointer"
+                [ngClass]="selectedIdentityDocumentType === documentType ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-slate-50 text-slate-500'"
+              >
+                <input type="radio" class="sr-only" formControlName="identityDocumentType" [value]="documentType" />
+                {{ documentType }}
+              </label>
+            </div>
+
             <input
               type="text"
               formControlName="numeroCinNin"
-              placeholder="1 000 0000 00000"
-              [ngClass]="fieldInvalid('numeroCinNin') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
+              (input)="sanitizeDigitsField('numeroCinNin', selectedIdentityDocumentType === 'CIN' ? 13 : 18, $event)"
+              [placeholder]="getIdentityNumberPlaceholder()"
+              [ngClass]="controlInvalid('numeroCinNin') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
               class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all tracking-widest"
             />
-            <p *ngIf="fieldInvalid('numeroCinNin')" class="text-red-500 text-[11px] font-bold ml-1">
-              Saisissez entre 13 et 15 chiffres.
+            <p *ngIf="controlInvalid('numeroCinNin')" class="text-red-500 text-[11px] font-bold ml-1">
+              @if (demandeForm.controls.numeroCinNin.errors?.['digitsOnly']) {
+                Le numéro doit contenir uniquement des chiffres.
+              } @else if (demandeForm.controls.numeroCinNin.errors?.['invalidCinLength']) {
+                Le numéro CIN doit contenir exactement 13 chiffres.
+              } @else if (demandeForm.controls.numeroCinNin.errors?.['invalidNinLength']) {
+                Le numéro NIN doit contenir exactement 18 chiffres.
+              } @else {
+                Ce champ est requis.
+              }
             </p>
           </div>
 
@@ -131,13 +154,18 @@
 
           <div class="space-y-2">
             <label class="text-xs font-black uppercase text-slate-500 ml-1">Commune</label>
-            <input
-              type="text"
+            <select
               formControlName="commune"
-              placeholder="Ex: Rufisque Est"
+              [disabled]="communes.length === 0"
               [ngClass]="fieldInvalid('commune') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
-              class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all"
-            />
+              class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none appearance-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <option value="">{{ communes.length > 0 ? 'Sélectionner la commune' : 'Choisissez d\'abord une région' }}</option>
+              <option *ngFor="let commune of communes" [value]="commune">{{ commune }}</option>
+            </select>
+            <p *ngIf="fieldInvalid('commune')" class="text-red-500 text-[11px] font-bold ml-1">
+              La commune est requise.
+            </p>
           </div>
         </div>
       </div>
@@ -173,6 +201,7 @@
             <label class="text-xs font-black uppercase text-slate-500">Motif</label>
             <textarea
               formControlName="motif"
+              (input)="handleMotifInput($event)"
               rows="6"
               placeholder="Décrivez votre besoin..."
               [ngClass]="fieldInvalid('motif') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
@@ -180,7 +209,11 @@
             ></textarea>
             <div class="flex justify-between items-center px-1">
               <p *ngIf="fieldInvalid('motif')" class="text-red-500 text-[11px] font-bold">
-                Minimum 20 caractères requis.
+                @if (demandeForm.controls.motif.errors?.['missingLetter']) {
+                  Le motif doit contenir des lettres.
+                } @else {
+                  Minimum 20 caractères requis.
+                }
               </p>
               <span class="text-[10px] text-slate-400 font-bold uppercase ml-auto">
                 {{ motifLength }} / 1000
@@ -204,7 +237,7 @@
         <div
           class="relative border-4 border-dashed rounded-4xl p-12 text-center hover:bg-slate-50 transition-all cursor-pointer group"
           (click)="fileInput.click()"
-          [ngClass]="hasDocumentError ? 'border-red-200 bg-red-50' : 'border-slate-100'"
+          [ngClass]="hasDocumentError || fileErrorMessage ? 'border-red-200 bg-red-50' : 'border-slate-100'"
         >
           <input
             #fileInput
@@ -213,16 +246,21 @@
             (change)="onFilesSelected($event)"
             multiple
             accept=".pdf,.jpg,.jpeg,.png"
+            [disabled]="!canAddMoreFiles"
           />
           <div class="w-16 h-16 bg-white shadow-lg rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
             <i class="fas fa-file-upload text-2xl text-emerald-500"></i>
           </div>
           <h3 class="font-bold text-slate-800">Cliquer pour ajouter des fichiers</h3>
-          <p class="text-xs text-slate-400 mt-1">PDF, JPG ou PNG autorisés</p>
+          <p class="text-xs text-slate-400 mt-1">PDF, JPG ou PNG autorisés, maximum 5 fichiers</p>
         </div>
 
         <div *ngIf="hasDocumentError" class="text-center text-red-500 text-xs font-bold mt-2">
           Au moins un document est requis pour valider votre demande.
+        </div>
+
+        <div *ngIf="fileErrorMessage" class="text-center text-red-500 text-xs font-bold mt-2">
+          {{ fileErrorMessage }}
         </div>
 
         <div *ngIf="selectedFiles.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -282,7 +320,7 @@
         <button
           type="button"
           (click)="nextStep()"
-          [disabled]="submitting"
+          [disabled]="submitting || !canProceedCurrentStep"
           [ngClass]="currentStep === totalSteps ? 'bg-emerald-600' : 'bg-slate-900'"
           class="px-12 py-5 text-white font-bold rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all disabled:cursor-not-allowed disabled:opacity-60"
         >
