@@ -25,6 +25,15 @@ export interface DemandePieceJointe {
   downloadUrl: string;
 }
 
+export interface DemandeProgrammeSummary {
+  id: number;
+  titre: string;
+  category: string;
+  description: string;
+  image: string;
+  active: boolean;
+}
+
 export interface DemandeResponse {
   id: number;
   numero: string;
@@ -39,6 +48,7 @@ export interface DemandeResponse {
   region?: string;
   commune?: string;
   programmeId?: number;
+  programme?: DemandeProgrammeSummary | null;
   motif?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -109,6 +119,6 @@ export const toDemandeFormValue = (
   numeroCinNin: demande?.numeroCinNin ?? '',
   region: demande?.region ?? '',
   commune: demande?.commune ?? '',
-  programmeId: demande?.programmeId ?? null,
+  programmeId: demande?.programmeId ?? demande?.programme?.id ?? null,
   motif: demande?.motif ?? '',
 });

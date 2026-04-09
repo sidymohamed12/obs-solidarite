@@ -1,171 +1,294 @@
-<section class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
-  <div class="bg-white border border-slate-100 rounded-[2rem] shadow-sm overflow-hidden">
-    <div class="px-6 sm:px-10 py-8 border-b border-slate-100 bg-slate-50/70">
-      <p class="text-xs font-black uppercase tracking-[0.2em] text-emerald-700">Demandes citoyen</p>
-      <h1 class="mt-3 text-3xl font-black text-slate-900">{{ title }}</h1>
-      <p class="mt-2 text-slate-600 max-w-3xl">{{ subtitle }}</p>
-    </div>
+<main class="max-w-5xl mx-auto px-6 py-12">
+  <div class="mb-8 text-center" *ngIf="title || subtitle">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900">{{ title }}</h1>
+    <p class="mt-3 text-slate-500 max-w-2xl mx-auto">{{ subtitle }}</p>
+  </div>
 
-    <form [formGroup]="demandeForm" (ngSubmit)="submit()" class="px-6 sm:px-10 py-8 space-y-8">
-      <div *ngIf="errorMessage" class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+  <div class="max-w-2xl mx-auto mb-16">
+    <div class="relative flex justify-between">
+      <div class="absolute top-5 left-0 w-full h-1 bg-slate-100 -z-10 rounded-full"></div>
+      <div
+        class="absolute top-5 left-0 h-1 bg-emerald-500 -z-10 rounded-full transition-all duration-700"
+        [style.width]="((currentStep - 1) / (totalSteps - 1)) * 100 + '%'"
+      ></div>
+
+      <div *ngFor="let step of [1, 2, 3]; let i = index" class="flex flex-col items-center">
+        <div
+          [ngClass]="{
+            'bg-emerald-600 text-white ring-8 ring-emerald-50': currentStep === i + 1,
+            'bg-emerald-500 text-white': currentStep > i + 1,
+            'bg-white border-2 border-slate-200 text-slate-400': currentStep < i + 1,
+          }"
+          class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-500"
+        >
+          <i *ngIf="currentStep > i + 1" class="fas fa-check"></i>
+          <span *ngIf="currentStep <= i + 1">{{ i + 1 }}</span>
+        </div>
+        <span
+          class="mt-3 text-[10px] font-black uppercase tracking-tighter"
+          [ngClass]="currentStep >= i + 1 ? 'text-emerald-600' : 'text-slate-400'"
+        >
+          {{ ['Identité', 'Besoin', 'Documents'][i] }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden">
+    <form [formGroup]="demandeForm" class="p-8 md:p-16">
+      <div *ngIf="errorMessage" class="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
         {{ errorMessage }}
       </div>
 
-      <div *ngIf="successMessage" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+      <div *ngIf="successMessage" class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
         {{ successMessage }}
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Prénom</label>
-          <input
-            type="text"
-            formControlName="prenom"
-            class="w-full rounded-2xl border px-4 py-3 outline-none transition"
-            [ngClass]="fieldInvalid('prenom') ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-white focus:border-emerald-500'"
-          />
-          <p *ngIf="fieldInvalid('prenom')" class="text-xs text-rose-600">Le prénom est requis.</p>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Nom</label>
-          <input
-            type="text"
-            formControlName="nom"
-            class="w-full rounded-2xl border px-4 py-3 outline-none transition"
-            [ngClass]="fieldInvalid('nom') ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-white focus:border-emerald-500'"
-          />
-          <p *ngIf="fieldInvalid('nom')" class="text-xs text-rose-600">Le nom est requis.</p>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Téléphone</label>
-          <input
-            type="text"
-            formControlName="telephone"
-            placeholder="Ex: 771234567"
-            class="w-full rounded-2xl border px-4 py-3 outline-none transition"
-            [ngClass]="fieldInvalid('telephone') ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-white focus:border-emerald-500'"
-          />
-          <p *ngIf="fieldInvalid('telephone')" class="text-xs text-rose-600">Le numéro doit être valide.</p>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Numéro CIN / NIN</label>
-          <input
-            type="text"
-            formControlName="numeroCinNin"
-            class="w-full rounded-2xl border px-4 py-3 outline-none transition"
-            [ngClass]="fieldInvalid('numeroCinNin') ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-white focus:border-emerald-500'"
-          />
-          <p *ngIf="fieldInvalid('numeroCinNin')" class="text-xs text-rose-600">Saisissez 13 à 15 chiffres.</p>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Région</label>
-          <select
-            formControlName="region"
-            class="w-full rounded-2xl border px-4 py-3 outline-none transition"
-            [ngClass]="fieldInvalid('region') ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-white focus:border-emerald-500'"
-          >
-            <option value="">Sélectionner une région</option>
-            <option *ngFor="let region of regions" [value]="region">{{ region }}</option>
-          </select>
-          <p *ngIf="fieldInvalid('region')" class="text-xs text-rose-600">La région est requise.</p>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Commune</label>
-          <input
-            type="text"
-            formControlName="commune"
-            class="w-full rounded-2xl border px-4 py-3 outline-none transition"
-            [ngClass]="fieldInvalid('commune') ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-white focus:border-emerald-500'"
-          />
-          <p *ngIf="fieldInvalid('commune')" class="text-xs text-rose-600">La commune est requise.</p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 gap-6">
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Programme</label>
-          <select
-            formControlName="programmeId"
-            class="w-full rounded-2xl border px-4 py-3 outline-none transition"
-            [ngClass]="fieldInvalid('programmeId') ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-white focus:border-emerald-500'"
-          >
-            <option [ngValue]="null">Sélectionner un programme</option>
-            <option *ngFor="let programme of programmes" [ngValue]="programme.id">{{ programme.label }}</option>
-          </select>
-          <p *ngIf="fieldInvalid('programmeId')" class="text-xs text-rose-600">Le programme est requis.</p>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-sm font-semibold text-slate-700">Motif</label>
-          <textarea
-            rows="6"
-            formControlName="motif"
-            class="w-full rounded-3xl border px-4 py-3 outline-none transition"
-            [ngClass]="fieldInvalid('motif') ? 'border-rose-400 bg-rose-50' : 'border-slate-200 bg-white focus:border-emerald-500'"
-          ></textarea>
-          <div class="flex items-center justify-between text-xs text-slate-500">
-            <span *ngIf="fieldInvalid('motif')" class="text-rose-600">Le motif doit contenir au moins 20 caractères.</span>
-            <span>{{ demandeForm.controls.motif.value?.length ?? 0 }} / 1000</span>
+      <div *ngIf="currentStep === 1" class="space-y-8">
+        <div class="flex items-center gap-4 mb-10">
+          <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl">
+            <i class="fas fa-address-card"></i>
           </div>
-        </div>
-      </div>
-
-      <div class="space-y-4 rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 px-5 py-6">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 class="text-lg font-bold text-slate-900">Pièces jointes</h2>
-            <p class="text-sm text-slate-600">Ajoutez un ou plusieurs fichiers avec la clé piecesJointes.</p>
+            <h2 class="text-2xl font-extrabold text-slate-800">Identification</h2>
+            <p class="text-slate-500">Informations personnelles du demandeur.</p>
           </div>
-          <label class="inline-flex cursor-pointer items-center justify-center rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-700 transition">
-            Sélectionner des fichiers
-            <input type="file" class="hidden" multiple (change)="onFilesSelected($event)" />
-          </label>
         </div>
 
-        <div *ngIf="selectedFiles.length > 0" class="space-y-3">
-          <div class="text-sm font-semibold text-slate-700">Nouveaux fichiers</div>
-          <div class="grid gap-3">
-            <div *ngFor="let file of selectedFiles; let index = index" class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3">
-              <div class="min-w-0">
-                <p class="truncate font-medium text-slate-900">{{ file.name }}</p>
-                <p class="text-xs text-slate-500">{{ file.type || 'Document' }}</p>
-              </div>
-              <button type="button" (click)="removeFile(index)" class="rounded-xl border border-rose-200 px-3 py-2 text-sm font-medium text-rose-700 hover:bg-rose-50 transition">
-                Retirer
-              </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-xs font-black uppercase text-slate-500 ml-1">Prénom(s)</label>
+            <input
+              type="text"
+              formControlName="prenom"
+              placeholder="Ex: Moussa"
+              [ngClass]="fieldInvalid('prenom') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
+              class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all"
+            />
+            <p *ngIf="fieldInvalid('prenom')" class="text-red-500 text-[11px] font-bold ml-1">
+              Prénom requis (min. 2 caractères).
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-black uppercase text-slate-500 ml-1">Nom</label>
+            <input
+              type="text"
+              formControlName="nom"
+              placeholder="Ex: Diagne"
+              [ngClass]="fieldInvalid('nom') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
+              class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all"
+            />
+            <p *ngIf="fieldInvalid('nom')" class="text-red-500 text-[11px] font-bold ml-1">
+              Nom requis.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-black uppercase text-slate-500 ml-1">Téléphone</label>
+            <div class="relative">
+              <span class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold border-r pr-3 border-slate-200">
+                +221
+              </span>
+              <input
+                type="tel"
+                formControlName="telephone"
+                placeholder="77 000 00 00"
+                [ngClass]="fieldInvalid('telephone') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
+                class="w-full pl-20 pr-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all"
+              />
             </div>
+            <p *ngIf="fieldInvalid('telephone')" class="text-red-500 text-[11px] font-bold ml-1">
+              Numéro valide requis.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-black uppercase text-slate-500 ml-1">Numéro CIN / NIN</label>
+            <input
+              type="text"
+              formControlName="numeroCinNin"
+              placeholder="1 000 0000 00000"
+              [ngClass]="fieldInvalid('numeroCinNin') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
+              class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all tracking-widest"
+            />
+            <p *ngIf="fieldInvalid('numeroCinNin')" class="text-red-500 text-[11px] font-bold ml-1">
+              Saisissez entre 13 et 15 chiffres.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-black uppercase text-slate-500 ml-1">Région</label>
+            <select
+              formControlName="region"
+              [ngClass]="fieldInvalid('region') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
+              class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none appearance-none cursor-pointer"
+            >
+              <option value="">Sélectionner la région</option>
+              <option *ngFor="let region of regions" [value]="region">{{ region }}</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-black uppercase text-slate-500 ml-1">Commune</label>
+            <input
+              type="text"
+              formControlName="commune"
+              placeholder="Ex: Rufisque Est"
+              [ngClass]="fieldInvalid('commune') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
+              class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none transition-all"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 2" class="space-y-8">
+        <div class="flex items-center gap-4 mb-10">
+          <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl">
+            <i class="fas fa-hand-holding-heart"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-extrabold text-slate-800">Détails de la demande</h2>
+            <p class="text-slate-500">Précisez le programme et votre situation.</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="space-y-2">
+            <label class="text-xs font-black uppercase text-slate-500">Programme cible</label>
+            <select
+              formControlName="programmeId"
+              [ngClass]="fieldInvalid('programmeId') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
+              class="w-full px-6 py-4 border rounded-2xl focus:border-emerald-500 outline-none"
+            >
+              <option [ngValue]="null" disabled>Choisir un programme...</option>
+              <option *ngFor="let programme of programmes" [ngValue]="programme.id">{{ programme.label }}</option>
+            </select>
+            <p *ngIf="fieldInvalid('programmeId')" class="text-red-500 text-[11px] font-bold">
+              Veuillez choisir un programme.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-black uppercase text-slate-500">Motif</label>
+            <textarea
+              formControlName="motif"
+              rows="6"
+              placeholder="Décrivez votre besoin..."
+              [ngClass]="fieldInvalid('motif') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'"
+              class="w-full px-6 py-4 border rounded-3xl focus:border-emerald-500 outline-none"
+            ></textarea>
+            <div class="flex justify-between items-center px-1">
+              <p *ngIf="fieldInvalid('motif')" class="text-red-500 text-[11px] font-bold">
+                Minimum 20 caractères requis.
+              </p>
+              <span class="text-[10px] text-slate-400 font-bold uppercase ml-auto">
+                {{ motifLength }} / 1000
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 3" class="space-y-8">
+        <div class="flex items-center gap-4 mb-10">
+          <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-extrabold text-slate-800">Pièces Jointes</h2>
+            <p class="text-slate-500">Téléversez votre CNI et justificatifs.</p>
+          </div>
+        </div>
+
+        <div
+          class="relative border-4 border-dashed rounded-4xl p-12 text-center hover:bg-slate-50 transition-all cursor-pointer group"
+          (click)="fileInput.click()"
+          [ngClass]="hasDocumentError ? 'border-red-200 bg-red-50' : 'border-slate-100'"
+        >
+          <input
+            #fileInput
+            type="file"
+            class="hidden"
+            (change)="onFilesSelected($event)"
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png"
+          />
+          <div class="w-16 h-16 bg-white shadow-lg rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <i class="fas fa-file-upload text-2xl text-emerald-500"></i>
+          </div>
+          <h3 class="font-bold text-slate-800">Cliquer pour ajouter des fichiers</h3>
+          <p class="text-xs text-slate-400 mt-1">PDF, JPG ou PNG autorisés</p>
+        </div>
+
+        <div *ngIf="hasDocumentError" class="text-center text-red-500 text-xs font-bold mt-2">
+          Au moins un document est requis pour valider votre demande.
+        </div>
+
+        <div *ngIf="selectedFiles.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div
+            *ngFor="let file of selectedFiles; let index = index"
+            class="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100"
+          >
+            <div class="flex items-center gap-3 overflow-hidden">
+              <i class="fas fa-file-alt text-emerald-600"></i>
+              <span class="text-xs font-bold text-emerald-800 truncate">{{ file.name }}</span>
+            </div>
+            <button
+              type="button"
+              (click)="removeFile(index); $event.stopPropagation()"
+              class="text-red-400 hover:text-red-600 p-1"
+            >
+              <i class="fas fa-times"></i>
+            </button>
           </div>
         </div>
 
         <div *ngIf="existingDocuments.length > 0" class="space-y-3">
           <div class="text-sm font-semibold text-slate-700">Documents déjà enregistrés</div>
-          <div class="grid gap-3">
-            <div *ngFor="let document of existingDocuments" class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3">
-              <div>
-                <p class="font-medium text-slate-900">{{ document.nomOriginal }}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div
+              *ngFor="let document of existingDocuments"
+              class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200"
+            >
+              <div class="min-w-0">
+                <p class="truncate text-sm font-semibold text-slate-700">{{ document.nomOriginal }}</p>
                 <p class="text-xs" [ngClass]="document.valide ? 'text-emerald-700' : 'text-amber-700'">
-                  {{ document.valide ? 'Document validé' : 'Document en attente de validation' }}
+                  {{ document.valide ? 'Document validé' : 'Document en attente' }}
                 </p>
               </div>
-              <button type="button" (click)="triggerDownload(document)" class="rounded-xl border border-emerald-200 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 transition">
-                Télécharger
+              <button
+                type="button"
+                (click)="triggerDownload(document)"
+                class="text-emerald-600 hover:text-emerald-800 p-1"
+              >
+                <i class="fas fa-download"></i>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <p class="text-sm text-slate-500"></p>
-        <button type="submit" [disabled]="submitting" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700 transition disabled:cursor-not-allowed disabled:bg-emerald-300">
-          {{ submitting ? 'Traitement...' : submitLabel }}
+      <div class="flex items-center justify-between mt-16 pt-10 border-t border-slate-50">
+        <button
+          type="button"
+          *ngIf="currentStep > 1"
+          (click)="prevStep()"
+          class="flex items-center gap-2 text-slate-400 font-bold hover:text-slate-900 transition-all"
+        >
+          <i class="fas fa-arrow-left"></i> Retour
+        </button>
+        <span *ngIf="currentStep === 1"></span>
+        <button
+          type="button"
+          (click)="nextStep()"
+          [disabled]="submitting"
+          [ngClass]="currentStep === totalSteps ? 'bg-emerald-600' : 'bg-slate-900'"
+          class="px-12 py-5 text-white font-bold rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {{ submitting ? 'Traitement...' : (currentStep === totalSteps ? submitLabel : 'Continuer') }}
         </button>
       </div>
     </form>
   </div>
-</section>
+</main>

@@ -32,6 +32,8 @@ export class DemandeFormComponent implements OnChanges {
 
   protected readonly regions = DEMANDE_REGIONS;
   private readonly fb = inject(FormBuilder);
+  private readonly stepOneFields = ['prenom', 'nom', 'telephone', 'numeroCinNin', 'region', 'commune'] as const;
+  private readonly stepTwoFields = ['programmeId', 'motif'] as const;
 
   protected readonly demandeForm = this.fb.group({
     prenom: ['', [Validators.required, Validators.minLength(2)]],
@@ -45,11 +47,26 @@ export class DemandeFormComponent implements OnChanges {
   });
 
   protected selectedFiles: File[] = [];
+  protected currentStep = 1;
+  protected readonly totalSteps = 3;
+  protected fileSelectionAttempted = false;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialValue'] && this.initialValue) {
       this.demandeForm.patchValue(this.initialValue);
     }
+  }
+
+  protected get motifLength(): number {
+    return this.demandeForm.controls.motif.value?.length ?? 0;
+  }
+
+  protected get hasDocumentError(): boolean {
+    return this.fileSelectionAttempted && this.totalDocumentsCount === 0;
+  }
+
+  protected get totalDocumentsCount(): number {
+    return this.selectedFiles.length + this.existingDocuments.length;
   }
 
   protected onFilesSelected(event: Event): void {
@@ -61,6 +78,7 @@ export class DemandeFormComponent implements OnChanges {
     }
 
     this.selectedFiles = [...this.selectedFiles, ...files];
+    this.fileSelectionAttempted = false;
     input.value = '';
   }
 
@@ -68,9 +86,31 @@ export class DemandeFormComponent implements OnChanges {
     this.selectedFiles = this.selectedFiles.filter((_, currentIndex) => currentIndex !== index);
   }
 
+  protected nextStep(): void {
+    if (this.currentStep === this.totalSteps) {
+      this.submit();
+      return;
+    }
+
+    if (!this.canMoveToNextStep()) {
+      return;
+    }
+
+    this.currentStep += 1;
+  }
+
+  protected prevStep(): void {
+    if (this.currentStep === 1) {
+      return;
+    }
+
+    this.currentStep -= 1;
+  }
+
   protected submit(): void {
-    if (this.demandeForm.invalid) {
+    if (this.demandeForm.invalid || this.totalDocumentsCount === 0) {
       this.demandeForm.markAllAsTouched();
+      this.fileSelectionAttempted = this.totalDocumentsCount === 0;
       return;
     }
 
@@ -96,5 +136,23 @@ export class DemandeFormComponent implements OnChanges {
   protected fieldInvalid(fieldName: keyof DemandeFormValue): boolean {
     const field = this.demandeForm.get(fieldName);
     return !!field && field.touched && field.invalid;
+  }
+
+  private canMoveToNextStep(): boolean {
+    if (this.currentStep === 1) {
+      this.markFieldsAsTouched(this.stepOneFields);
+      return this.stepOneFields.every((fieldName) => this.demandeForm.get(fieldName)?.valid);
+    }
+
+    if (this.currentStep === 2) {
+      this.markFieldsAsTouched(this.stepTwoFields);
+      return this.stepTwoFields.every((fieldName) => this.demandeForm.get(fieldName)?.valid);
+    }
+
+    return true;
+  }
+
+  private markFieldsAsTouched(fieldNames: readonly string[]): void {
+    fieldNames.forEach((fieldName) => this.demandeForm.get(fieldName)?.markAsTouched());
   }
 }

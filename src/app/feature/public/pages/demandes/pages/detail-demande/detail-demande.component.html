@@ -19,12 +19,12 @@
     {{ successMessage }}
   </div>
 
-  <section *ngIf="loading" class="rounded-[2rem] border border-slate-100 bg-white px-6 py-10 text-center text-slate-500 shadow-sm">
+  <section *ngIf="loading" class="rounded-4xl border border-slate-100 bg-white px-6 py-10 text-center text-slate-500 shadow-sm">
     Chargement de la demande...
   </section>
 
   <ng-container *ngIf="!loading && demande as currentDemande">
-    <section class="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
+    <section class="rounded-4xl border border-slate-100 bg-white p-6 shadow-sm">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <span class="inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase" [ngClass]="getStatusBadge(currentDemande.statut)">
@@ -44,7 +44,7 @@
     </section>
 
     <section class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-      <article class="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm space-y-5">
+      <article class="rounded-4xl border border-slate-100 bg-white p-6 shadow-sm space-y-5">
         <h2 class="text-xl font-bold text-slate-900">Informations du demandeur</h2>
         <div class="grid gap-4 sm:grid-cols-2 text-sm text-slate-600">
           <p><span class="font-semibold text-slate-900">Prénom :</span> {{ currentDemande.prenom || '-' }}</p>
@@ -59,7 +59,7 @@
         </div>
       </article>
 
-      <article class="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm space-y-5">
+      <article class="rounded-4xl border border-slate-100 bg-white p-6 shadow-sm space-y-5">
         <div class="flex items-center justify-between gap-4">
           <h2 class="text-xl font-bold text-slate-900">Documents</h2>
           <span class="text-sm text-slate-500">{{ documents.length }} fichier(s)</span>
