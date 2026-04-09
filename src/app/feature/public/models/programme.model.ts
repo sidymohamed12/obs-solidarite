@@ -1,9 +1,10 @@
 export interface Programme {
-  id: string;
+  id: number;
   titre: string;
   category: string;
   description: string;
   image: string;
+  active: boolean;
 }
 
 export interface FilterOptions {
@@ -12,7 +13,7 @@ export interface FilterOptions {
 }
 
 export interface ProgramType {
-  id: string;
+  id: number;
   label: string;
   checked: boolean;
 }

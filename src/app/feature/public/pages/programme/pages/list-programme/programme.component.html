@@ -37,7 +37,7 @@
 
       <div class="grid grid-cols-3 gap-4 max-w-2xl mx-auto">
         <div class="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-slate-100">
-          <div class="text-3xl font-black text-emerald-600">5+</div>
+          <div class="text-3xl font-black text-emerald-600">{{ totalProgrammes }}</div>
           <div class="text-xs text-slate-600 font-medium">Programmes</div>
         </div>
         <div class="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-md border border-slate-100">
@@ -63,29 +63,25 @@
 
       <div class="flex flex-wrap items-center gap-2">
         <button
-          data-filter="all"
-          class="filter-btn active px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-emerald-500 text-white shadow-lg shadow-emerald-200 hover:scale-105"
+          type="button"
+          (click)="selectCategory('all')"
+          [class]="isSelectedCategory('all')
+            ? 'filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-emerald-500 text-white shadow-lg shadow-emerald-200 hover:scale-105'
+            : 'filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200'"
         >
           Tous
         </button>
-        <button
-          data-filter="sante"
-          class="filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200"
-        >
-          Social
-        </button>
-        <button
-          data-filter="rural"
-          class="filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200"
-        >
-          Santé
-        </button>
-        <button
-          data-filter="urbain"
-          class="filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200"
-        >
-          Rural & Services
-        </button>
+        @for (category of categories; track category) {
+          <button
+            type="button"
+            (click)="selectCategory(category)"
+            [class]="isSelectedCategory(category)
+              ? 'filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-emerald-500 text-white shadow-lg shadow-emerald-200 hover:scale-105'
+              : 'filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200'"
+          >
+            {{ category }}
+          </button>
+        }
       </div>
     </div>
   </div>
@@ -94,9 +90,30 @@
 <!-- programs -->
 <section class="py-20 bg-linear-to-b from-white to-slate-50">
   <div class="max-w-7xl mx-auto px-6">
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-      @for (programme of programmes; track $index) {
-        <div class="group cursor-pointer perspective-1000">
+    @if (errorMessage) {
+      <div class="mb-8 rounded-3xl border border-rose-200 bg-rose-50 px-6 py-4 text-rose-700">
+        {{ errorMessage }}
+      </div>
+    }
+
+    @if (isProgramsLoading) {
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+        @for (placeholder of [1, 2, 3, 4, 5, 6]; track placeholder) {
+          <div class="rounded-[2.5rem] border border-slate-100 bg-white p-8 shadow-2xl shadow-slate-200/30">
+            <div class="h-72 animate-pulse rounded-4xl bg-slate-100"></div>
+            <div class="mt-8 h-6 w-2/3 animate-pulse rounded-full bg-slate-100"></div>
+            <div class="mt-4 h-4 w-full animate-pulse rounded-full bg-slate-100"></div>
+            <div class="mt-2 h-4 w-4/5 animate-pulse rounded-full bg-slate-100"></div>
+          </div>
+        }
+      </div>
+    } @else if (paginatedProgrammes.length > 0) {
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+        @for (programme of paginatedProgrammes; track programme.id) {
+        <a
+          [routerLink]="['/public/programme', programme.id]"
+          class="group block cursor-pointer perspective-1000"
+        >
           <div
             class="relative bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-2xl shadow-slate-200/40 transition-all duration-500 hover:shadow-emerald-200/50 hover:-translate-y-4"
           >
@@ -104,7 +121,7 @@
               <img
                 [src]="programme.image"
                 class="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
-                alt="Santé"
+                [alt]="programme.titre"
               />
 
               <div
@@ -150,14 +167,26 @@
               </div>
             </div>
           </div>
-        </div>
+        </a>
       }
-    </div>
+      </div>
+    } @else {
+      <div class="rounded-[2.5rem] border border-dashed border-slate-300 bg-white/90 px-8 py-16 text-center shadow-sm">
+        <p class="text-lg font-bold text-slate-800">Aucun programme ne correspond à ce filtre.</p>
+        <p class="mt-2 text-sm text-slate-500">
+          Essayez une autre catégorie pour élargir les résultats.
+        </p>
+      </div>
+    }
 
     <!-- Pagination -->
+    @if (!isProgramsLoading && filteredProgrammes.length > 0) {
     <div class="mt-16 flex flex-col items-center gap-6">
       <div class="flex items-center gap-3">
         <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
           class="group flex items-center justify-center w-12 h-12 rounded-2xl border border-slate-200 bg-white text-slate-400 transition-all duration-300 hover:border-emerald-500 hover:text-emerald-500 hover:shadow-xl hover:shadow-emerald-100 disabled:opacity-30 disabled:pointer-events-none"
         >
           <i class="fa-solid fa-chevron-left text-sm"></i>
@@ -166,34 +195,27 @@
         <div
           class="flex items-center gap-2 bg-slate-100/50 p-1.5 rounded-[1.25rem] border border-slate-100"
         >
-          <button
-            class="w-11 h-11 rounded-xl bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-200 transition-transform active:scale-95"
-          >
-            1
-          </button>
-
-          <button
-            class="w-11 h-11 rounded-xl text-slate-600 font-semibold hover:bg-white hover:shadow-sm transition-all active:scale-95"
-          >
-            2
-          </button>
-
-          <button
-            class="w-11 h-11 rounded-xl text-slate-600 font-semibold hover:bg-white hover:shadow-sm transition-all active:scale-95"
-          >
-            3
-          </button>
-
-          <span class="px-2 text-slate-400">...</span>
-
-          <button
-            class="w-11 h-11 rounded-xl text-slate-600 font-semibold hover:bg-white hover:shadow-sm transition-all active:scale-95"
-          >
-            5
-          </button>
+          @for (item of paginationItems; track $index) {
+            @if (item === 'ellipsis') {
+              <span class="px-2 text-slate-400">...</span>
+            } @else {
+              <button
+                type="button"
+                (click)="goToPage(item)"
+                [class]="item === currentPage
+                  ? 'w-11 h-11 rounded-xl bg-emerald-500 text-white font-bold shadow-lg shadow-emerald-200 transition-transform active:scale-95'
+                  : 'w-11 h-11 rounded-xl text-slate-600 font-semibold hover:bg-white hover:shadow-sm transition-all active:scale-95'"
+              >
+                {{ item }}
+              </button>
+            }
+          }
         </div>
 
         <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
           class="group flex items-center justify-center w-12 h-12 rounded-2xl border border-slate-200 bg-white text-slate-400 transition-all duration-300 hover:border-emerald-500 hover:text-emerald-500 hover:shadow-xl hover:shadow-emerald-100"
         >
           <i class="fa-solid fa-chevron-right text-sm"></i>
@@ -201,10 +223,11 @@
       </div>
 
       <p class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-        Affichage de <span class="text-slate-800">1-6</span> sur
-        <span class="text-slate-800">30</span> programmes
+        Affichage de <span class="text-slate-800">{{ visibleRangeStart }}-{{ visibleRangeEnd }}</span>
+        sur <span class="text-slate-800">{{ filteredProgrammes.length }}</span> programmes
       </p>
     </div>
+    }
   </div>
 
   <!-- Besoin d'aide -->

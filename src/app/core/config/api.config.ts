@@ -28,4 +28,7 @@ export const API_ENDPOINTS = {
     downloadDocument: (id: number | string, documentId: number | string) =>
       `${API_BASE_URL}/api/v1/web/citoyen/demandes/${id}/documents/${documentId}/download`,
   },
+  programmes: {
+    base: `${API_BASE_URL}/api/v1/web/programmes`,
+  },
 };

@@ -34,13 +34,13 @@ export class LoginComponent implements OnInit {
 
   private initForms(): void {
     this.emailForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(4)]],
+      email: ['test2@example.com', [Validators.required, Validators.email]],
+      password: ['12345678', [Validators.required, Validators.minLength(4)]],
     });
 
     this.phoneForm = this.fb.group({
-      phone: ['', [Validators.required, Validators.pattern('^\\+?[0-9 ]{8,15}$')]],
-      pin: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern('^[0-9]+$')]],
+      phone: ['700000002', [Validators.required, Validators.pattern('^\\+?[0-9 ]{8,15}$')]],
+      pin: ['1234', [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern('^[0-9]+$')]],
     });
   }
 

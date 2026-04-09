@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { PublicLayoutComponent } from '../../layout/public-layout/public-layout.component';
 import { AccueilComponent } from './pages/accueil/accueil.component';
 import { ProgrammeComponent } from './pages/programme/pages/list-programme/programme.component';
+import { DetailProgrammeComponent } from './pages/programme/pages/detail-programme/detail-programme.component';
 import { CarteActionComponent } from './pages/carte-action/carte-action.component';
 import { RealisationActualiteComponent } from './pages/realisation-actualite/pages/list-article/realisation-actualite.component';
 import { AddDemandeComponent } from './pages/demandes/pages/add-demande/add-demande.component';
@@ -17,7 +18,7 @@ export const PUBLIC_ROUTES: Routes = [
       { path: '', redirectTo: 'accueil', pathMatch: 'full' },
       { path: 'accueil', component: AccueilComponent },
       { path: 'programme', component: ProgrammeComponent },
-      // { path: 'programme/:id', component: ProgrammeComponent, title: 'Programmes' },
+      { path: 'programme/:id', component: DetailProgrammeComponent, title: 'Programme' },
       { path: 'carte-action', component: CarteActionComponent },
       { path: 'demandes', component: ListDemandeComponent },
       { path: 'demandes/nouveau', component: AddDemandeComponent },
