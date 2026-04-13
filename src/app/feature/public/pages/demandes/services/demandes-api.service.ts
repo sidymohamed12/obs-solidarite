@@ -14,6 +14,10 @@ export class DemandesApiService {
     return this.http.get<DemandeResponse[]>(API_ENDPOINTS.demandes.base);
   }
 
+  listAgentDemandes(): Observable<DemandeResponse[]> {
+    return this.http.get<DemandeResponse[]>(API_ENDPOINTS.demandes.agentBase);
+  }
+
   getDemande(id: number | string): Observable<DemandeResponse> {
     return this.http.get<DemandeResponse>(API_ENDPOINTS.demandes.byId(id));
   }

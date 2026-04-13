@@ -10,8 +10,8 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    redirectTo: 'public',
-    pathMatch: 'full',
+    canActivate: [authGuard],
+    loadChildren: () => import('./feature/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
   },
   {
     path: 'auth/public',

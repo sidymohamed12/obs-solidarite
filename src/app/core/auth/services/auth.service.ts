@@ -13,7 +13,7 @@ import {
 
 export const TOKEN_KEY = 'taxawu_token';
 export const USER_KEY = 'taxawu_user';
-const ADMIN_AREA_ENABLED = false;
+const ADMIN_AREA_ENABLED = true;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

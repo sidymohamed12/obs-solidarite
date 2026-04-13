@@ -10,10 +10,14 @@ import { Programme } from '../../../models/programme.model';
 export class ProgrammeService {
   private readonly http = inject(HttpClient);
 
+  getAllPrograms(): Observable<Programme[]> {
+    return this.http.get<Programme[]>(API_ENDPOINTS.programmes.base);
+  }
+
   getPrograms(): Observable<Programme[]> {
-    return this.http
-      .get<Programme[]>(API_ENDPOINTS.programmes.base)
-      .pipe(map((programmes) => programmes.filter((programme) => programme.active)));
+    return this.getAllPrograms().pipe(
+      map((programmes) => programmes.filter((programme) => programme.active)),
+    );
   }
 
   getProgramById(id: number | string): Observable<Programme | undefined> {

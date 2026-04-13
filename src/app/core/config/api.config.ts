@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
   },
   demandes: {
     base: `${API_BASE_URL}/api/v1/web/citoyen/demandes`,
+    agentBase: `${API_BASE_URL}/api/v1/web/agent/demandes`,
     byId: (id: number | string) => `${API_BASE_URL}/api/v1/web/citoyen/demandes/${id}`,
     documents: (id: number | string) =>
       `${API_BASE_URL}/api/v1/web/citoyen/demandes/${id}/documents`,
