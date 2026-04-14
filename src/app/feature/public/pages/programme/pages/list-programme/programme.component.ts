@@ -14,6 +14,7 @@ type ProgrammePageItem = number | 'ellipsis';
 })
 export class ProgrammeComponent implements OnInit {
   programmes: Programme[] = [];
+  categories: string[] = [];
   isProgramsLoading: boolean = false;
   errorMessage: string | null = null;
   selectedCategory: string = 'all';
@@ -23,6 +24,7 @@ export class ProgrammeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProgrammes();
+    this.loadCategories();
   }
 
   loadProgrammes(): void {
@@ -43,8 +45,15 @@ export class ProgrammeComponent implements OnInit {
       });
   }
 
-  get categories(): string[] {
-    return [...new Set(this.programmes.map((programme) => programme.category))];
+  loadCategories(): void {
+    this.programmeService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
   }
 
   get filteredProgrammes(): Programme[] {
@@ -52,7 +61,7 @@ export class ProgrammeComponent implements OnInit {
       return this.programmes;
     }
 
-    return this.programmes.filter((programme) => programme.category === this.selectedCategory);
+    return this.programmes.filter((programme) => programme.categorieNom === this.selectedCategory);
   }
 
   get paginatedProgrammes(): Programme[] {

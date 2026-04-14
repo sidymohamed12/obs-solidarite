@@ -1,9 +1,20 @@
 export interface Programme {
   id: number;
   titre: string;
-  category: string;
+  // category: string;
   description: string;
   image: string;
+  active: boolean;
+  categorieId: number;
+  categorieNom: string;
+  code: string;
+}
+
+export interface ProgrammeCategory {
+  id: number;
+  nom: string;
+  code: string;
+  description: string;
   active: boolean;
 }
 

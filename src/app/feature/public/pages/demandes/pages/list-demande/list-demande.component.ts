@@ -221,7 +221,7 @@ export class ListDemandeComponent implements OnInit {
     this.programmeService.getPrograms().subscribe({
       next: (programmes) => {
         this.programmeCategories = new Map(
-          programmes.map((programme) => [Number(programme.id), programme.category]),
+          programmes.map((programme) => [Number(programme.id), programme.categorieNom]),
         );
       },
       error: () => {
