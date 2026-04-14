@@ -73,22 +73,13 @@
           <p class="text-sm sm:text-base text-gray-600">Rejoignez la plateforme Taxawu Solidarités</p>
         </div>
 
-        <!-- Sélecteur de rôle -->
+        <!-- Rôle fixe -->
         <div class="mb-5 sm:mb-6 animate-fadeInUp delay-150">
-          <div class="bg-gray-100 rounded-xl p-1 sm:p-1.5">
-            <div class="flex gap-1">
-              <button
-                *ngFor="let r of roles"
-                type="button"
-                (click)="setRole(r.value)"
-                class="flex-1 py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5"
-                [ngClass]="selectedRole === r.value
-                  ? 'bg-white shadow-sm text-[#047857]'
-                  : 'text-gray-500 hover:text-gray-700'"
-              >
-                <i [class]="r.icon + ' text-sm sm:text-base'"></i>
-                {{ r.label }}
-              </button>
+          <div class="bg-gray-100 rounded-xl p-3 sm:p-4 text-center">
+            <p class="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-[0.2em]">Type de compte</p>
+            <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-sm text-[#047857]">
+              <i class="fa-solid fa-user text-sm sm:text-base"></i>
+              <span class="text-sm sm:text-base font-semibold">Citoyen</span>
             </div>
           </div>
         </div>
@@ -117,7 +108,7 @@
               <input
                 type="text"
                 formControlName="prenom"
-                placeholder="Moussa"
+                placeholder=""
                 class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
                 [class.border-red-400]="fieldError('prenom')"
               />
@@ -128,7 +119,7 @@
               <input
                 type="text"
                 formControlName="nom"
-                placeholder="Diallo"
+                placeholder=""
                 class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
                 [class.border-red-400]="fieldError('nom')"
               />
@@ -146,7 +137,7 @@
               <input
                 type="text"
                 formControlName="username"
-                placeholder="moussa.diallo"
+                placeholder=""
                 class="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
                 [class.border-red-400]="fieldError('username')"
               />
@@ -154,8 +145,35 @@
             <p *ngIf="fieldError('username')" class="mt-1 text-xs text-red-500">Nom d'utilisateur requis (3–30 car.)</p>
           </div>
 
-          <!-- Email -->
+          <!-- Méthode de contact -->
           <div>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Méthode de contact</label>
+            <div class="bg-gray-100 rounded-xl p-1 sm:p-1.5">
+              <div class="flex gap-1">
+                <button
+                  type="button"
+                  (click)="setContactMethod('email')"
+                  class="flex-1 py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5"
+                  [ngClass]="contactMethod === 'email' ? 'bg-white shadow-sm text-[#047857]' : 'text-gray-500 hover:text-gray-700'"
+                >
+                  <i class="fa-regular fa-envelope text-sm sm:text-base"></i>
+                  Email
+                </button>
+                <button
+                  type="button"
+                  (click)="setContactMethod('phone')"
+                  class="flex-1 py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5"
+                  [ngClass]="contactMethod === 'phone' ? 'bg-white shadow-sm text-[#047857]' : 'text-gray-500 hover:text-gray-700'"
+                >
+                  <i class="fa-solid fa-phone text-sm sm:text-base"></i>
+                  Téléphone
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact (Email ou Téléphone) -->
+          <div *ngIf="contactMethod === 'email'; else phoneContactField">
             <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Adresse email</label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
@@ -164,7 +182,7 @@
               <input
                 type="email"
                 formControlName="email"
-                placeholder="exemple@email.com"
+                placeholder="Votre email"
                 class="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
                 [class.border-red-400]="fieldError('email')"
               />
@@ -172,46 +190,7 @@
             <p *ngIf="fieldError('email')" class="mt-1 text-xs text-red-500">Email valide requis</p>
           </div>
 
-          <!-- Mot de passe + Confirmation -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div>
-              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Mot de passe</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                  <i class="fa-solid fa-lock text-gray-400 text-sm sm:text-base"></i>
-                </div>
-                <input
-                  type="password"
-                  formControlName="password"
-                  placeholder="••••••••"
-                  class="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
-                  [class.border-red-400]="fieldError('password')"
-                />
-              </div>
-              <p *ngIf="fieldError('password')" class="mt-1 text-xs text-red-500">Min. 4 caractères</p>
-            </div>
-            <div>
-              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Confirmation</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                  <i class="fa-solid fa-lock text-gray-400 text-sm sm:text-base"></i>
-                </div>
-                <input
-                  type="password"
-                  formControlName="confirmPassword"
-                  placeholder="••••••••"
-                  class="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
-                  [class.border-red-400]="fieldError('confirmPassword') || (registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched)"
-                />
-              </div>
-              <p *ngIf="registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched" class="mt-1 text-xs text-red-500">
-                Mots de passe différents
-              </p>
-            </div>
-          </div>
-
-          <!-- Téléphone + Code PIN -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <ng-template #phoneContactField>
             <div>
               <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Téléphone</label>
               <div class="relative">
@@ -228,22 +207,43 @@
               </div>
               <p *ngIf="fieldError('phoneNumber')" class="mt-1 text-xs text-red-500">Numéro invalide</p>
             </div>
+          </ng-template>
+
+          <!-- Mot de passe + Confirmation -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Code PIN <span class="text-gray-400 font-normal">(4 chiffres)</span></label>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Mot de passe</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                  <i class="fa-solid fa-shield-halved text-gray-400 text-sm sm:text-base"></i>
+                  <i class="fa-solid fa-lock text-gray-400 text-sm sm:text-base"></i>
                 </div>
                 <input
                   type="password"
-                  formControlName="codePin"
-                  maxlength="4"
-                  placeholder="••••"
+                  formControlName="password"
+                  placeholder=""
                   class="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
-                  [class.border-red-400]="fieldError('codePin')"
+                  [class.border-red-400]="fieldError('password')"
                 />
               </div>
-              <p *ngIf="fieldError('codePin')" class="mt-1 text-xs text-red-500">4 chiffres requis</p>
+              <p *ngIf="fieldError('password')" class="mt-1 text-xs text-red-500">Min. 4 caractères</p>
+            </div>
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Confirmation</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                  <i class="fa-solid fa-lock text-gray-400 text-sm sm:text-base"></i>
+                </div>
+                <input
+                  type="password"
+                  formControlName="confirmPassword"
+                  placeholder=""
+                  class="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
+                  [class.border-red-400]="fieldError('confirmPassword') || (registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched)"
+                />
+              </div>
+              <p *ngIf="registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched" class="mt-1 text-xs text-red-500">
+                Mots de passe différents
+              </p>
             </div>
           </div>
 

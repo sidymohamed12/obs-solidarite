@@ -1,5 +1,7 @@
 export type UserRole = 'CITOYEN' | 'AGENT' | 'ADMIN';
 
+export type ContactMethod = 'email' | 'phone';
+
 export interface UserDto {
   id: number;
   username: string;
@@ -38,8 +40,34 @@ export interface RegisterRequest {
   username: string;
   prenom: string;
   nom: string;
-  email: string;
+  email?: string;
   password: string;
-  phoneNumber: string;
-  codePin: string;
+  phoneNumber?: string;
+}
+
+export interface LoginRequest {
+  identifier: string;
+  password: string;
+}
+
+export interface PendingRegistration {
+  username: string;
+  prenom: string;
+  nom: string;
+  contactMethod: ContactMethod;
+  contactValue: string;
+  password: string;
+  createdAt: string;
+}
+
+export interface VerifiedRegistration {
+  identifier: string;
+  password: string;
+  username: string;
+  prenom: string;
+  nom: string;
+  contactMethod: ContactMethod;
+  verifiedAt: string;
+  token: string;
+  user: UserDto;
 }

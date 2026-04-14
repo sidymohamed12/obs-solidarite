@@ -3,7 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
-import { RegisterRequest, UserRole } from '../../../../../../core/auth/models/auth.models';
+import { RegisterRequest } from '../../../../../../core/auth/models/auth.models';
 
 @Component({
   selector: 'app-register',
@@ -15,14 +15,8 @@ export class RegisterComponent implements OnInit {
   protected readonly auth = inject(AuthService);
   private readonly fb = inject(FormBuilder);
 
-  selectedRole: UserRole = 'CITOYEN';
+  contactMethod: 'email' | 'phone' = 'email';
   registerForm!: FormGroup;
-
-  readonly roles: { value: UserRole; label: string; icon: string }[] = [
-    { value: 'CITOYEN', label: 'Citoyen', icon: 'fa-solid fa-user' },
-    { value: 'AGENT', label: 'Agent', icon: 'fa-solid fa-id-badge' },
-    { value: 'ADMIN', label: 'Admin', icon: 'fa-solid fa-shield-halved' },
-  ];
 
   ngOnInit(): void {
     this.initForm();
@@ -37,11 +31,12 @@ export class RegisterComponent implements OnInit {
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(4)]],
         confirmPassword: ['', Validators.required],
-        phoneNumber: ['', [Validators.required, Validators.pattern('^\\+?[0-9 ]{8,15}$')]],
-        codePin: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern('^[0-9]+$')]],
+        phoneNumber: ['', []],
       },
       { validators: this.passwordMatchValidator }
     );
+
+    this.applyContactValidators();
   }
 
   private passwordMatchValidator(form: FormGroup): { passwordMismatch: true } | null {
@@ -50,9 +45,14 @@ export class RegisterComponent implements OnInit {
     return pw && cpw && pw !== cpw ? { passwordMismatch: true } : null;
   }
 
-  setRole(role: UserRole): void {
-    this.selectedRole = role;
+  setContactMethod(method: 'email' | 'phone'): void {
+    if (this.contactMethod === method) {
+      return;
+    }
+
+    this.contactMethod = method;
     this.auth.clearError();
+    this.applyContactValidators();
   }
 
   fieldError(field: string): boolean {
@@ -65,8 +65,37 @@ export class RegisterComponent implements OnInit {
       this.registerForm.markAllAsTouched();
       return;
     }
-    const { confirmPassword, ...rest } = this.registerForm.value;
-    const payload: RegisterRequest = rest;
-    this.auth.register(payload, this.selectedRole);
+
+    const { confirmPassword, email, phoneNumber, ...rest } = this.registerForm.value;
+    const payload: RegisterRequest = {
+      ...rest,
+      ...(this.contactMethod === 'email'
+        ? { email: (email ?? '').trim() }
+        : { phoneNumber: (phoneNumber ?? '').trim() }),
+    };
+
+    this.auth.register(payload);
+  }
+
+  private applyContactValidators(): void {
+    const emailCtrl = this.registerForm.get('email');
+    const phoneCtrl = this.registerForm.get('phoneNumber');
+
+    if (!emailCtrl || !phoneCtrl) {
+      return;
+    }
+
+    if (this.contactMethod === 'email') {
+      emailCtrl.setValidators([Validators.required, Validators.email]);
+      phoneCtrl.setValidators([]);
+      phoneCtrl.setValue('');
+    } else {
+      emailCtrl.setValidators([]);
+      emailCtrl.setValue('');
+      phoneCtrl.setValidators([Validators.required, Validators.pattern('^\\+?[0-9 ]{8,15}$')]);
+    }
+
+    emailCtrl.updateValueAndValidity();
+    phoneCtrl.updateValueAndValidity();
   }
 }
