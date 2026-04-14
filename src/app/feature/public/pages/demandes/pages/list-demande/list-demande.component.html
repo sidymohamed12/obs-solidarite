@@ -177,23 +177,36 @@
           <h3 class="font-bold text-lg mb-4">Documents transmis</h3>
 
           <div *ngIf="selectedDocuments.length > 0; else noDocs" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button
-              *ngFor="let doc of selectedDocuments"
-              type="button"
-              (click)="downloadDocument(doc)"
-              [disabled]="downloadingDocumentId === doc.id"
-              class="flex items-center justify-between p-4 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all group cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              <div class="flex items-center gap-3 min-w-0">
-                <i class="fas text-2xl transition-transform group-hover:scale-110" [ngClass]="getFileIcon(doc)"></i>
-                <div class="flex flex-col min-w-0 text-left">
-                  <span class="text-sm font-semibold text-gray-700 truncate">{{ getFileNameOnly(doc) }}</span>
-                  <span class="text-xs text-gray-400">{{ getFileType(doc) }}</span>
+            <article *ngFor="let doc of selectedDocuments" class="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+              <div class="flex items-center gap-3 border-b border-gray-100 p-4">
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50 border border-slate-200">
+                  <i class="fas text-2xl" [ngClass]="getFileIcon(doc)"></i>
+                </div>
+                <div class="min-w-0 flex-1 text-left">
+                  <span class="block truncate text-sm font-semibold text-gray-700">{{ getFileNameOnly(doc) }}</span>
+                  <span class="block text-xs text-gray-400">{{ getFileType(doc) }} • {{ doc.mimeType || 'Type non renseigné' }} • {{ formatFileSize(doc.size) }}</span>
                 </div>
               </div>
 
-              <i class="fas fa-external-link-alt text-gray-300 group-hover:text-blue-500 transition-colors text-xs"></i>
-            </button>
+              <div class="flex flex-wrap gap-2 bg-slate-50 px-4 py-3">
+                <button
+                  type="button"
+                  (click)="openDocument(doc)"
+                  [disabled]="downloadingDocumentId === doc.id"
+                  class="rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-white transition disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  Ouvrir
+                </button>
+                <button
+                  type="button"
+                  (click)="downloadDocument(doc)"
+                  [disabled]="downloadingDocumentId === doc.id"
+                  class="rounded-xl border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-50 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {{ downloadingDocumentId === doc.id ? 'Traitement...' : 'Télécharger' }}
+                </button>
+              </div>
+            </article>
           </div>
 
           <ng-template #noDocs>

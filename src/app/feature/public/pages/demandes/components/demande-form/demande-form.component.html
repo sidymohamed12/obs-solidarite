@@ -245,14 +245,14 @@
             class="hidden"
             (change)="onFilesSelected($event)"
             multiple
-            accept=".pdf,.jpg,.jpeg,.png"
+            accept="*/*"
             [disabled]="!canAddMoreFiles"
           />
           <div class="w-16 h-16 bg-white shadow-lg rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
             <i class="fas fa-file-upload text-2xl text-emerald-500"></i>
           </div>
           <h3 class="font-bold text-slate-800">Cliquer pour ajouter des fichiers</h3>
-          <p class="text-xs text-slate-400 mt-1">PDF, JPG ou PNG autorisés, maximum 5 fichiers</p>
+          <p class="text-xs text-slate-400 mt-1">Images, PDF et autres fichiers autorisés, maximum {{ maxFileCount }} fichiers</p>
         </div>
 
         <div *ngIf="hasDocumentError" class="text-center text-red-500 text-xs font-bold mt-2">
@@ -263,22 +263,50 @@
           {{ fileErrorMessage }}
         </div>
 
-        <div *ngIf="selectedFiles.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div *ngIf="selectedFiles.length > 0" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div
             *ngFor="let file of selectedFiles; let index = index"
-            class="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100"
+            class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
           >
-            <div class="flex items-center gap-3 overflow-hidden">
-              <i class="fas fa-file-alt text-emerald-600"></i>
-              <span class="text-xs font-bold text-emerald-800 truncate">{{ file.name }}</span>
+            <div class="flex items-center gap-4 border-b border-slate-100 p-4">
+              <div
+                class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-50 border border-slate-200"
+                [ngClass]="file.kind === 'image' ? 'bg-slate-50' : 'bg-slate-50'"
+              >
+                <img *ngIf="file.kind === 'image'" [src]="file.previewUrl" [alt]="file.file.name" class="h-full w-full object-cover" />
+                <div *ngIf="file.kind !== 'image'" class="flex h-full w-full items-center justify-center text-slate-400">
+                  <i class="fas text-3xl" [ngClass]="getPreviewIcon(file)"></i>
+                </div>
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-700">
+                    {{ previewLabel(file) }}
+                  </span>
+                  <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    {{ formatFileSize(file.size) }}
+                  </span>
+                </div>
+                <p class="mt-2 truncate text-sm font-semibold text-slate-800">{{ file.file.name }}</p>
+                <p class="truncate text-xs text-slate-500">{{ file.mimeType }}</p>
+              </div>
             </div>
-            <button
-              type="button"
-              (click)="removeFile(index); $event.stopPropagation()"
-              class="text-red-400 hover:text-red-600 p-1"
-            >
-              <i class="fas fa-times"></i>
-            </button>
+
+            <div class="flex flex-wrap items-center gap-2 p-4">
+              <button type="button" (click)="openPreview(file)" class="rounded-full border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition">
+                Ouvrir
+              </button>
+              <button type="button" (click)="downloadFile(file)" class="rounded-full border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-50 transition">
+                Télécharger
+              </button>
+              <button type="button" (click)="replaceFile(index, fileInput); $event.stopPropagation()" class="rounded-full border border-amber-200 px-3 py-2 text-xs font-bold text-amber-700 hover:bg-amber-50 transition">
+                Remplacer
+              </button>
+              <button type="button" (click)="removeFile(index); $event.stopPropagation()" class="rounded-full border border-rose-200 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50 transition">
+                Supprimer
+              </button>
+            </div>
           </div>
         </div>
 
@@ -287,21 +315,24 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div
               *ngFor="let document of existingDocuments"
-              class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200"
+              class="flex items-center justify-between gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200"
             >
               <div class="min-w-0">
                 <p class="truncate text-sm font-semibold text-slate-700">{{ document.nomOriginal }}</p>
                 <p class="text-xs" [ngClass]="document.valide ? 'text-emerald-700' : 'text-amber-700'">
                   {{ document.valide ? 'Document validé' : 'Document en attente' }}
                 </p>
+                <p class="mt-1 text-xs text-slate-500">{{ document.mimeType || 'Type non renseigné' }} • {{ document.size ? formatFileSize(document.size) : 'Taille inconnue' }}</p>
               </div>
-              <button
-                type="button"
-                (click)="triggerDownload(document)"
-                class="text-emerald-600 hover:text-emerald-800 p-1"
-              >
-                <i class="fas fa-download"></i>
-              </button>
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  (click)="triggerDownload(document)"
+                  class="rounded-full border border-emerald-200 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-50"
+                >
+                  Télécharger
+                </button>
+              </div>
             </div>
           </div>
         </div>

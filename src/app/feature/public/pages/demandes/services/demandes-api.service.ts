@@ -1,8 +1,9 @@
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, delay, of, throwError } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable, delay, from, of, throwError } from 'rxjs';
 import { DemandePayload, DemandePieceJointe, DemandeResponse } from '../models/demande.model';
 import { PROGRAMMES_MOCK } from '../../programme/services/programme.service';
+import { DemandeDocumentStorageService } from './demande-document-storage.service';
 
 const MOCK_DEMANDES_STORAGE_KEY = 'taxawu_mock_demandes';
 
@@ -15,6 +16,7 @@ interface StoredDemandeState {
   providedIn: 'root',
 })
 export class DemandesApiService {
+  private readonly documentStorage = inject(DemandeDocumentStorageService);
   private state: StoredDemandeState = this.loadState();
 
   listDemandes(): Observable<DemandeResponse[]> {
@@ -36,10 +38,67 @@ export class DemandesApiService {
   }
 
   createDemande(payload: DemandePayload): Observable<DemandeResponse> {
+    return from(this.createDemandeAsync(payload)).pipe(delay(180));
+  }
+
+  updateDemande(id: number | string, payload: DemandePayload): Observable<DemandeResponse> {
+    return from(this.updateDemandeAsync(id, payload)).pipe(delay(180));
+  }
+
+  updateDemandeStatut(
+    id: number | string,
+    statut: DemandeResponse['statut'],
+    traitePar?: { id: number; nom: string } | null,
+  ): Observable<DemandeResponse> {
+    const demandeId = Number(id);
+    const current = this.findDemande(demandeId);
+
+    if (!current) {
+      return throwError(() => ({ error: { message: 'Demande introuvable.' }, message: 'Demande introuvable.' }));
+    }
+
+    const updated: DemandeResponse = {
+      ...current,
+      statut,
+      traiteParId: traitePar?.id ?? current.traiteParId,
+      traiteParNom: traitePar?.nom ?? current.traiteParNom,
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.state = {
+      ...this.state,
+      demandes: this.state.demandes.map((demande) => (demande.id === demandeId ? updated : demande)),
+    };
+    this.persistState();
+
+    return of({ ...updated, piecesJointes: [...updated.piecesJointes] }).pipe(delay(150));
+  }
+
+  deleteDemande(id: number | string): Observable<void> {
+    return from(this.deleteDemandeAsync(id)).pipe(delay(120));
+  }
+
+  listDocuments(id: number | string): Observable<DemandePieceJointe[]> {
+    const demande = this.findDemande(id);
+    if (!demande) {
+      return throwError(() => ({ error: { message: 'Documents introuvables.' }, message: 'Documents introuvables.' }));
+    }
+
+    return of(demande.piecesJointes.map((document) => ({ ...document }))).pipe(delay(100));
+  }
+
+  downloadDocument(
+    id: number | string,
+    documentId: number | string,
+  ): Observable<HttpResponse<Blob>> {
+    return from(this.downloadDocumentAsync(id, documentId)).pipe(delay(120));
+  }
+
+  private async createDemandeAsync(payload: DemandePayload): Promise<DemandeResponse> {
     const now = new Date().toISOString();
     const newId = this.nextDemandeId();
     const newNumero = this.generateNumero(newId);
-    const piecesJointes = this.createPiecesJointes(newId, payload.piecesJointes);
+    const piecesJointes = await this.createPiecesJointes(newId, payload.piecesJointes);
     const programme = PROGRAMMES_MOCK.find((item) => item.id === Number(payload.programmeId)) ?? null;
 
     const created: DemandeResponse = {
@@ -68,19 +127,19 @@ export class DemandesApiService {
     };
     this.persistState();
 
-    return of({ ...created, piecesJointes: [...created.piecesJointes] }).pipe(delay(180));
+    return { ...created, piecesJointes: [...created.piecesJointes] };
   }
 
-  updateDemande(id: number | string, payload: DemandePayload): Observable<DemandeResponse> {
+  private async updateDemandeAsync(id: number | string, payload: DemandePayload): Promise<DemandeResponse> {
     const demandeId = Number(id);
     const current = this.findDemande(demandeId);
 
     if (!current) {
-      return throwError(() => ({ error: { message: 'Demande introuvable.' }, message: 'Demande introuvable.' }));
+      throw { error: { message: 'Demande introuvable.' }, message: 'Demande introuvable.' };
     }
 
     const now = new Date().toISOString();
-    const newPieces = this.createPiecesJointes(demandeId, payload.piecesJointes);
+    const newPieces = await this.createPiecesJointes(demandeId, payload.piecesJointes);
     const programme = PROGRAMMES_MOCK.find((item) => item.id === Number(payload.programmeId)) ?? null;
 
     const updated: DemandeResponse = {
@@ -104,16 +163,22 @@ export class DemandesApiService {
     };
     this.persistState();
 
-    return of({ ...updated, piecesJointes: [...updated.piecesJointes] }).pipe(delay(180));
+    return { ...updated, piecesJointes: [...updated.piecesJointes] };
   }
 
-  deleteDemande(id: number | string): Observable<void> {
+  private async deleteDemandeAsync(id: number | string): Promise<void> {
     const demandeId = Number(id);
     const current = this.findDemande(demandeId);
 
     if (!current) {
-      return throwError(() => ({ error: { message: 'Demande introuvable.' }, message: 'Demande introuvable.' }));
+      throw { error: { message: 'Demande introuvable.' }, message: 'Demande introuvable.' };
     }
+
+      await Promise.allSettled(
+      current.piecesJointes
+        .filter((document) => !!document.storageKey)
+        .map((document) => this.documentStorage.delete(document.storageKey as string)),
+    );
 
     const removedKeys = new Set(current.piecesJointes.map((document) => this.documentKey(demandeId, document.id)));
     const filteredContent = Object.fromEntries(
@@ -125,50 +190,44 @@ export class DemandesApiService {
       documentContentByKey: filteredContent,
     };
     this.persistState();
-
-    return of(void 0).pipe(delay(120));
   }
 
-  listDocuments(id: number | string): Observable<DemandePieceJointe[]> {
-    const demande = this.findDemande(id);
-    if (!demande) {
-      return throwError(() => ({ error: { message: 'Documents introuvables.' }, message: 'Documents introuvables.' }));
-    }
-
-    return of(demande.piecesJointes.map((document) => ({ ...document }))).pipe(delay(100));
-  }
-
-  downloadDocument(
+  private async downloadDocumentAsync(
     id: number | string,
     documentId: number | string,
-  ): Observable<HttpResponse<Blob>> {
+  ): Promise<HttpResponse<Blob>> {
     const demandeId = Number(id);
     const docId = Number(documentId);
     const demande = this.findDemande(demandeId);
 
     if (!demande) {
-      return throwError(() => ({ error: { message: 'Demande introuvable.' }, message: 'Demande introuvable.' }));
+      throw { error: { message: 'Demande introuvable.' }, message: 'Demande introuvable.' };
     }
 
     const document = demande.piecesJointes.find((piece) => piece.id === docId);
     if (!document) {
-      return throwError(() => ({ error: { message: 'Document introuvable.' }, message: 'Document introuvable.' }));
+      throw { error: { message: 'Document introuvable.' }, message: 'Document introuvable.' };
     }
 
-    const content =
-      this.state.documentContentByKey[this.documentKey(demandeId, docId)] ??
-      `Document statique: ${document.nomOriginal}\nDemande: ${demande.numero}`;
+      let blob: Blob;
 
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const response = new HttpResponse<Blob>({
+      if (document.storageKey) {
+        try {
+          blob = (await this.documentStorage.read(document.storageKey)) ?? this.buildFallbackBlob(demande, document);
+        } catch {
+          blob = this.buildFallbackBlob(demande, document);
+        }
+      } else {
+        blob = this.buildFallbackBlob(demande, document);
+      }
+
+    return new HttpResponse<Blob>({
       body: blob,
       headers: new HttpHeaders({
         'content-disposition': `attachment; filename="${encodeURIComponent(document.nomOriginal)}"`,
       }),
       status: 200,
     });
-
-    return of(response).pipe(delay(120));
   }
 
   private findDemande(id: number | string): DemandeResponse | undefined {
@@ -191,28 +250,65 @@ export class DemandesApiService {
     return `TXW-${new Date().getFullYear()}-${String(id).padStart(4, '0')}`;
   }
 
-  private createPiecesJointes(demandeId: number, files: File[]): DemandePieceJointe[] {
+  private async createPiecesJointes(demandeId: number, files: File[]): Promise<DemandePieceJointe[]> {
     if (!files || files.length === 0) {
       return [];
     }
 
     let documentId = this.nextDocumentId();
-    const pieces = files.map((file) => {
+    const pieces: DemandePieceJointe[] = [];
+
+    for (const file of files) {
       const currentId = documentId;
       documentId += 1;
 
-      this.state.documentContentByKey[this.documentKey(demandeId, currentId)] =
-        `Fichier importé en mode statique: ${file.name}\nTaille: ${file.size} octets`;
+      const storageKey = this.documentKey(demandeId, currentId);
+      try {
+        await this.documentStorage.save(storageKey, file);
+      } catch {
+        this.state.documentContentByKey[storageKey] = `Fichier importé en mode statique: ${file.name}\nTaille: ${file.size} octets`;
+      }
 
-      return {
+      pieces.push({
         id: currentId,
         nomOriginal: file.name,
         valide: true,
         downloadUrl: '#',
-      };
-    });
+        mimeType: file.type || this.detectMimeType(file.name),
+        size: file.size,
+        storageKey,
+      });
+    }
 
     return pieces;
+  }
+
+  private buildFallbackBlob(demande: DemandeResponse, document: DemandePieceJointe): Blob {
+    const content =
+      this.state.documentContentByKey[this.documentKey(demande.id, document.id)] ??
+      `Document statique: ${document.nomOriginal}\nDemande: ${demande.numero}`;
+
+    return new Blob([content], { type: document.mimeType || 'text/plain;charset=utf-8' });
+  }
+
+  private detectMimeType(fileName: string): string {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+
+    switch (extension) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      default:
+        return 'application/octet-stream';
+    }
   }
 
   private documentKey(demandeId: number, documentId: number): string {
@@ -290,12 +386,16 @@ export class DemandesApiService {
             nomOriginal: 'piece-identite.pdf',
             valide: true,
             downloadUrl: '#',
+            mimeType: 'application/pdf',
+            size: 184320,
           },
           {
             id: 102,
             nomOriginal: 'certificat-residence.pdf',
             valide: true,
             downloadUrl: '#',
+            mimeType: 'application/pdf',
+            size: 92160,
           },
         ],
         createdAt: '2026-03-10T09:30:00.000Z',
@@ -322,6 +422,8 @@ export class DemandesApiService {
             nomOriginal: 'attestation-medicale.pdf',
             valide: true,
             downloadUrl: '#',
+            mimeType: 'application/pdf',
+            size: 110592,
           },
         ],
         createdAt: '2026-03-12T11:15:00.000Z',
@@ -348,6 +450,8 @@ export class DemandesApiService {
             nomOriginal: 'plan-activite.pdf',
             valide: false,
             downloadUrl: '#',
+            mimeType: 'application/pdf',
+            size: 74240,
           },
         ],
         createdAt: '2026-03-15T08:10:00.000Z',

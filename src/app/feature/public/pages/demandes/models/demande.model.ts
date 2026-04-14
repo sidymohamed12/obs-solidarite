@@ -23,6 +23,9 @@ export interface DemandePieceJointe {
   nomOriginal: string;
   valide: boolean;
   downloadUrl: string;
+  mimeType?: string;
+  size?: number;
+  storageKey?: string;
 }
 
 export interface DemandeProgrammeSummary {

@@ -1,0 +1,61 @@
+<section class="max-w-640 mx-auto px-4 sm:px-8 lg:px-16 py-8">
+  <header class="mb-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <p class="text-xs font-black uppercase tracking-[0.22em] text-emerald-700">Administration</p>
+    <h2 class="mt-2 text-2xl font-black text-slate-900">Gestion des demandes citoyennes</h2>
+    <p class="mt-2 text-sm text-slate-500">Visualisation centralisée des demandes soumises sur la plateforme.</p>
+  </header>
+
+  <div *ngIf="loading" class="rounded-3xl border border-slate-200 bg-white p-10 text-center text-slate-500">Chargement des demandes…</div>
+
+  <div *ngIf="errorMessage" class="rounded-3xl border border-rose-200 bg-rose-50 p-6 text-sm text-rose-700">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="mt-4 rounded-3xl border border-emerald-200 bg-emerald-50 p-6 text-sm text-emerald-700">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="!loading && !errorMessage" class="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-slate-50 text-slate-600 uppercase text-xs tracking-[0.16em]">
+          <tr>
+            <th class="px-5 py-4 text-left">N° dossier</th>
+            <th class="px-5 py-4 text-left">Citoyen</th>
+            <th class="px-5 py-4 text-left">Contact</th>
+            <th class="px-5 py-4 text-left">Région</th>
+            <th class="px-5 py-4 text-left">Statut</th>
+            <th class="px-5 py-4 text-left">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let demande of demandes" class="hover:bg-slate-50/70">
+            <td class="px-5 py-4 font-semibold text-slate-900">{{ demande.numero }}</td>
+            <td class="px-5 py-4 text-slate-700">{{ demande.prenom }} {{ demande.nom }}</td>
+            <td class="px-5 py-4 text-slate-600">{{ demande.telephone || '—' }}</td>
+            <td class="px-5 py-4 text-slate-600">{{ demande.region || '—' }}</td>
+            <td class="px-5 py-4">
+              <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="getStatusBadge(demande.statut)">
+                {{ getStatusLabel(demande.statut) }}
+              </span>
+            </td>
+            <td class="px-5 py-4">
+              <button
+                type="button"
+                (click)="validateDemande(demande)"
+                [disabled]="demande.statut === 'VALIDEE'"
+                class="rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] transition"
+                [ngClass]="demande.statut === 'VALIDEE' ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400' : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'"
+              >
+                {{ demande.statut === 'VALIDEE' ? 'Déjà validé' : 'Valider' }}
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="demandes.length === 0">
+            <td colspan="6" class="px-5 py-8 text-center text-slate-500">Aucune demande disponible.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

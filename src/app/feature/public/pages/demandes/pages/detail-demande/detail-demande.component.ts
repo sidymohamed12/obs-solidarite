@@ -73,6 +73,26 @@ export class DetailDemandeComponent implements OnInit {
       });
   }
 
+  protected open(document: DemandePieceJointe): void {
+    if (!this.demande) {
+      return;
+    }
+
+    this.downloadingDocumentId = document.id;
+
+    this.demandesApi
+      .downloadDocument(this.demande.id, document.id)
+      .pipe(finalize(() => (this.downloadingDocumentId = null)))
+      .subscribe({
+        next: (response) => {
+          this.openBlob(response, document.nomOriginal);
+        },
+        error: (error) => {
+          this.errorMessage = this.extractError(error);
+        },
+      });
+  }
+
   protected deleteDemande(): void {
     if (!this.demande || !window.confirm(`Supprimer la demande ${this.demande.numero} ?`)) {
       return;
@@ -155,6 +175,72 @@ export class DetailDemandeComponent implements OnInit {
     link.click();
 
     URL.revokeObjectURL(objectUrl);
+  }
+
+  private openBlob(response: HttpResponse<Blob>, fallbackFileName: string): void {
+    const blob = response.body;
+
+    if (!blob) {
+      this.errorMessage = 'Le document à ouvrir est vide.';
+      return;
+    }
+
+    const header = response.headers.get('content-disposition') ?? '';
+    const extractedFileName = header.match(/filename\*?=(?:UTF-8''|\")?([^;\"]+)/i)?.[1];
+    const fileName = decodeURIComponent((extractedFileName ?? fallbackFileName).replace(/\"/g, ''));
+    const objectUrl = URL.createObjectURL(blob);
+    const newTab = window.open(objectUrl, '_blank', 'noopener,noreferrer');
+
+    if (!newTab) {
+      this.errorMessage = `Impossible d'ouvrir ${fileName}.`;
+    }
+
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  }
+
+  protected formatFileSize(size?: number): string {
+    if (!size) {
+      return 'Taille inconnue';
+    }
+
+    if (size < 1024) {
+      return `${size} o`;
+    }
+
+    if (size < 1024 * 1024) {
+      return `${(size / 1024).toFixed(1)} Ko`;
+    }
+
+    return `${(size / (1024 * 1024)).toFixed(1)} Mo`;
+  }
+
+  protected getFileKind(document: DemandePieceJointe): 'image' | 'pdf' | 'generic' {
+    const mimeType = document.mimeType?.toLowerCase() ?? '';
+    const extension = document.nomOriginal.split('.').pop()?.toLowerCase();
+
+    if (mimeType.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension ?? '')) {
+      return 'image';
+    }
+
+    if (mimeType === 'application/pdf' || extension === 'pdf') {
+      return 'pdf';
+    }
+
+    return 'generic';
+  }
+
+  protected getFileIcon(document: DemandePieceJointe): string {
+    const kind = this.getFileKind(document);
+
+    if (kind === 'image') {
+      return 'fa-image text-sky-500';
+    }
+
+    if (kind === 'pdf') {
+      return 'fa-file-pdf text-rose-500';
+    }
+
+    return 'fa-file-lines text-slate-500';
   }
 
   private extractError(error: unknown): string {

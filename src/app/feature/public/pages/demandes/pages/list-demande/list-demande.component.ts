@@ -195,6 +195,43 @@ export class ListDemandeComponent implements OnInit {
       });
   }
 
+  protected openDocument(document: DemandePieceJointe): void {
+    if (!this.selectedDemande) {
+      return;
+    }
+
+    this.downloadingDocumentId = document.id;
+    this.errorMessage = null;
+
+    this.demandesApi
+      .downloadDocument(this.selectedDemande.id, document.id)
+      .pipe(finalize(() => (this.downloadingDocumentId = null)))
+      .subscribe({
+        next: (response) => {
+          this.openBlob(response, document.nomOriginal);
+        },
+        error: (error) => {
+          this.errorMessage = this.extractError(error);
+        },
+      });
+  }
+
+  protected formatFileSize(size?: number): string {
+    if (!size) {
+      return 'Taille inconnue';
+    }
+
+    if (size < 1024) {
+      return `${size} o`;
+    }
+
+    if (size < 1024 * 1024) {
+      return `${(size / 1024).toFixed(1)} Ko`;
+    }
+
+    return `${(size / (1024 * 1024)).toFixed(1)} Mo`;
+  }
+
   private loadDemandes(): void {
     this.loading = true;
     this.errorMessage = null;
@@ -309,6 +346,24 @@ export class ListDemandeComponent implements OnInit {
     link.click();
 
     URL.revokeObjectURL(objectUrl);
+  }
+
+  private openBlob(response: HttpResponse<Blob>, fallbackFileName: string): void {
+    const blob = response.body;
+
+    if (!blob) {
+      this.errorMessage = 'Le document à ouvrir est vide.';
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(blob);
+    const newTab = window.open(objectUrl, '_blank', 'noopener,noreferrer');
+
+    if (!newTab) {
+      this.errorMessage = `Impossible d'ouvrir ${fallbackFileName}.`;
+    }
+
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
   }
 
   private extractError(error: unknown): string {

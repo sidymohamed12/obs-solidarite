@@ -75,16 +75,31 @@
         </div>
 
         <div *ngIf="documents.length > 0" class="space-y-3">
-          <div *ngFor="let document of documents" class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3">
-            <div>
-              <p class="font-medium text-slate-900">{{ document.nomOriginal }}</p>
-              <p class="text-xs" [ngClass]="document.valide ? 'text-emerald-700' : 'text-amber-700'">
-                {{ document.valide ? 'Validé' : 'En attente de validation' }}
-              </p>
+          <div *ngFor="let document of documents" class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <div class="flex items-center gap-4 p-4">
+              <div class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-slate-50 border border-slate-200">
+                <div class="flex h-full w-full items-center justify-center text-slate-400">
+                  <i class="fa-solid text-2xl" [ngClass]="getFileIcon(document)"></i>
+                </div>
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p class="truncate font-medium text-slate-900">{{ document.nomOriginal }}</p>
+                <p class="text-xs" [ngClass]="document.valide ? 'text-emerald-700' : 'text-amber-700'">
+                  {{ document.valide ? 'Validé' : 'En attente de validation' }}
+                </p>
+                <p class="mt-1 text-xs text-slate-500">{{ document.mimeType || 'Type non renseigné' }} • {{ formatFileSize(document.size) }}</p>
+              </div>
             </div>
-            <button type="button" (click)="download(document)" [disabled]="downloadingDocumentId === document.id" class="rounded-xl border border-emerald-200 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 transition disabled:cursor-not-allowed disabled:opacity-60">
-              {{ downloadingDocumentId === document.id ? 'Téléchargement...' : 'Télécharger' }}
-            </button>
+
+            <div class="flex flex-wrap gap-2 border-t border-slate-100 bg-slate-50 px-4 py-3">
+              <button type="button" (click)="open(document)" [disabled]="downloadingDocumentId === document.id" class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white transition disabled:cursor-not-allowed disabled:opacity-60">
+                Ouvrir
+              </button>
+              <button type="button" (click)="download(document)" [disabled]="downloadingDocumentId === document.id" class="rounded-xl border border-emerald-200 px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 transition disabled:cursor-not-allowed disabled:opacity-60">
+                {{ downloadingDocumentId === document.id ? 'Traitement...' : 'Télécharger' }}
+              </button>
+            </div>
           </div>
         </div>
       </article>
