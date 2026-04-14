@@ -13,10 +13,9 @@ import {
 import { DemandesApiService } from '../../../public/pages/demandes/services/demandes-api.service';
 import { ProgrammeService } from '../../../public/pages/programme/services/programme.service';
 
-type AgentStatusFilter = 'ALL' | 'EN_ATTENTE' | 'EN_COURS' | 'A_COMPLETER' | 'VALIDEE' | 'REJETEE' | 'CLOTUREE';
-type AgentWorkflowAction = 'PRISE_EN_CHARGE' | 'EN_COURS' | 'A_COMPLETER' | 'VALIDEE' | 'REJETEE';
+type AgentStatusFilter = 'ALL' | 'EN_ATTENTE' | 'EN_COURS' | 'VALIDEE' | 'REJETEE';
+type AgentWorkflowAction = 'PRISE_EN_CHARGE' | 'EN_COURS' | 'VALIDEE' | 'REJETEE';
 const AGENT_WORKFLOW_STORAGE_KEY = 'taxawu_agent_workflow_state';
-const AGENT_DEMANDE_PATCHES_STORAGE_KEY = 'taxawu_agent_demande_patches';
 
 interface AgentWorkflowChecklist {
   identiteVerifiee: boolean;
@@ -28,18 +27,12 @@ interface AgentWorkflowChecklist {
 interface AgentWorkflowState {
   assignedAt: string | null;
   instructionStartedAt: string | null;
-  completionRequestedAt: string | null;
   lastDecisionAt: string | null;
   lastDecisionLabel: string | null;
   notes: string;
-  completionReason: string;
   rejectionReason: string;
   checklist: AgentWorkflowChecklist;
 }
-
-type PersistedDemandePatch = Partial<
-  Pick<DemandeResponse, 'id' | 'statut' | 'traiteParId' | 'traiteParNom' | 'updatedAt'>
->;
 
 @Component({
   selector: 'app-agent-demandes',
@@ -55,6 +48,7 @@ export class AgentDemandesComponent implements OnInit {
   protected loading = false;
   protected selectedLoading = false;
   protected downloadingDocumentId: number | null = null;
+  protected actionLoading = false;
   protected errorMessage: string | null = null;
   protected infoMessage = signal<string | null>(null);
 
@@ -73,7 +67,6 @@ export class AgentDemandesComponent implements OnInit {
   private readonly programmeTitles = new Map<number, string>();
   private readonly programmeCategories = new Map<number, string>();
   private readonly workflowStates = new Map<number, AgentWorkflowState>();
-  private readonly demandePatches = new Map<number, PersistedDemandePatch>();
 
   protected readonly currentAgent = computed(() => this.auth.user());
   protected readonly currentAgentId = computed(() => this.currentAgent()?.id ?? null);
@@ -97,7 +90,7 @@ export class AgentDemandesComponent implements OnInit {
         `${demande.prenom ?? ''} ${demande.nom ?? ''}`.toLowerCase().includes(term) ||
         (demande.telephone ?? '').toLowerCase().includes(term);
 
-      const matchesStatus = this.selectedStatus === 'ALL' || demande.statut === this.selectedStatus;
+      const matchesStatus = this.matchesSelectedStatus(demande.statut);
       const matchesRegion = this.selectedRegion === 'ALL' || demande.region === this.selectedRegion;
       const matchesProgramme =
         this.selectedProgramme === 'ALL' || this.getProgrammeTitle(demande) === this.selectedProgramme;
@@ -122,7 +115,6 @@ export class AgentDemandesComponent implements OnInit {
     return [
       { label: 'En attente', value: this.countByStatus('EN_ATTENTE'), status: 'EN_ATTENTE', accent: 'text-slate-900' },
       { label: 'En cours', value: this.countByStatus('EN_COURS'), status: 'EN_COURS', accent: 'text-amber-700' },
-      { label: 'À compléter', value: this.countByStatus('A_COMPLETER'), status: 'A_COMPLETER', accent: 'text-orange-700' },
       { label: 'Validées', value: this.countByStatus('VALIDEE'), status: 'VALIDEE', accent: 'text-emerald-700' },
       { label: 'Rejetées', value: this.countByStatus('REJETEE'), status: 'REJETEE', accent: 'text-rose-700' },
     ];
@@ -164,12 +156,12 @@ export class AgentDemandesComponent implements OnInit {
   }
 
   protected getProgrammeCategory(demande: DemandeResponse): string {
-    if (demande.programme?.category) {
-      return demande.programme.category;
+    if (demande.programme?.categorieNom) {
+      return demande.programme.categorieNom;
     }
 
-    if (demande.programmeId) {
-      return this.programmeCategories.get(demande.programmeId) ?? 'Catégorie indisponible';
+    if (demande.programme?.id) {
+      return this.programmeCategories.get(demande.programme.id) ?? 'Catégorie indisponible';
     }
 
     return 'Catégorie indisponible';
@@ -183,10 +175,9 @@ export class AgentDemandesComponent implements OnInit {
     const badgeClasses: Record<string, string> = {
       EN_ATTENTE: 'bg-slate-100 text-slate-700',
       EN_COURS: 'bg-amber-100 text-amber-700',
-      A_COMPLETER: 'bg-orange-100 text-orange-700',
       VALIDEE: 'bg-sky-100 text-sky-700',
+      VERIFIEE: 'bg-sky-100 text-sky-700',
       REJETEE: 'bg-rose-100 text-rose-700',
-      CLOTUREE: 'bg-emerald-100 text-emerald-700',
     };
 
     return badgeClasses[status] ?? 'bg-slate-100 text-slate-700';
@@ -246,14 +237,13 @@ export class AgentDemandesComponent implements OnInit {
   }
 
   protected executeWorkflowAction(action: AgentWorkflowAction): void {
-    if (!this.selectedDemande) {
+    if (!this.selectedDemande || this.actionLoading) {
       return;
     }
 
     const labels: Record<AgentWorkflowAction, string> = {
       PRISE_EN_CHARGE: 'prise en charge',
       EN_COURS: 'mise en instruction',
-      A_COMPLETER: 'demande de pièces complémentaires',
       VALIDEE: 'validation',
       REJETEE: 'rejet',
     };
@@ -261,70 +251,71 @@ export class AgentDemandesComponent implements OnInit {
     const demande = this.selectedDemande;
     const workflow = this.ensureWorkflowState(demande);
     const now = new Date().toISOString();
+    let request;
+    let fallbackPatch: Partial<DemandeResponse> = {};
 
     switch (action) {
       case 'PRISE_EN_CHARGE':
-        this.applyDemandePatch(demande.id, {
-          traiteParId: this.currentAgentId(),
-          traiteParNom: this.currentAgentFullName() || 'Agent affecté',
-        });
-        workflow.assignedAt = now;
-        break;
-      case 'EN_COURS':
-        this.applyDemandePatch(demande.id, {
+        request = this.demandesApi.takeInChargeDemande(demande.id);
+        fallbackPatch = {
           statut: 'EN_COURS',
           traiteParId: this.currentAgentId(),
-          traiteParNom: this.currentAgentFullName() || demande.traiteParNom,
-        });
-        workflow.assignedAt ??= now;
+          traiteParNom: this.currentAgentFullName() || 'Agent affecté',
+        };
+        workflow.assignedAt = now;
         workflow.instructionStartedAt = now;
         break;
-      case 'A_COMPLETER':
-        this.applyDemandePatch(demande.id, { statut: 'A_COMPLETER' });
-        workflow.completionRequestedAt = now;
-        workflow.lastDecisionAt = now;
-        workflow.lastDecisionLabel = 'Compléments demandés';
-        if (!workflow.completionReason.trim()) {
-          workflow.completionReason = 'Pièces ou informations complémentaires à fournir.';
-        }
-        break;
+      case 'EN_COURS':
+        this.infoMessage.set('La prise en charge déclenche deja la phase d\'instruction.');
+        return;
       case 'VALIDEE':
-        this.applyDemandePatch(demande.id, { statut: 'VALIDEE' });
+        request = this.demandesApi.verifyDemande(demande.id);
+        fallbackPatch = { statut: 'VERIFIEE' };
         workflow.lastDecisionAt = now;
         workflow.lastDecisionLabel = 'Dossier validé';
         workflow.checklist.analyseFinalisee = true;
         break;
       case 'REJETEE':
-        this.applyDemandePatch(demande.id, { statut: 'REJETEE' });
-        workflow.lastDecisionAt = now;
-        workflow.lastDecisionLabel = 'Dossier rejeté';
         if (!workflow.rejectionReason.trim()) {
           workflow.rejectionReason = 'Motif de rejet à préciser côté backend.';
         }
+        request = this.demandesApi.rejectDemande(demande.id, {
+          motif: workflow.rejectionReason.trim(),
+        });
+        fallbackPatch = { statut: 'REJETEE' };
+        workflow.lastDecisionAt = now;
+        workflow.lastDecisionLabel = 'Dossier rejeté';
         break;
+      default:
+        this.infoMessage.set(`Action ${labels[action]} non disponible dans le flow backend actuel.`);
+        return;
     }
 
-    this.selectedWorkflowState = workflow;
-    this.persistLocalState();
+    this.actionLoading = true;
+    this.errorMessage = null;
 
-    this.infoMessage.set(
-      `Simulation front: ${labels[action]} appliquée visuellement sur le dossier. Le branchement backend reste à faire.`
-    );
+    request.pipe(finalize(() => (this.actionLoading = false))).subscribe({
+      next: (updatedDemande) => {
+        this.applyServerDemandeUpdate(demande.id, fallbackPatch, updatedDemande);
+        this.selectedWorkflowState = workflow;
+        this.persistLocalState();
+        this.infoMessage.set(`La ${labels[action]} a bien été enregistrée.`);
+      },
+      error: (error) => {
+        this.errorMessage = this.extractError(error);
+      },
+    });
   }
 
   protected getInstructionPhaseLabel(demande: DemandeResponse): string {
     const workflow = this.ensureWorkflowState(demande);
 
-    if (demande.statut === 'VALIDEE') {
+    if (this.isVerifiedStatus(demande.statut)) {
       return 'Instruction terminée avec validation';
     }
 
     if (demande.statut === 'REJETEE') {
       return 'Instruction terminée avec rejet';
-    }
-
-    if (demande.statut === 'A_COMPLETER') {
-      return 'En attente de compléments du citoyen';
     }
 
     if (demande.statut === 'EN_COURS' || workflow.instructionStartedAt) {
@@ -342,12 +333,8 @@ export class AgentDemandesComponent implements OnInit {
     const workflow = this.ensureWorkflowState(demande);
     const checklistValues = Object.values(workflow.checklist).filter(Boolean).length;
 
-    if (demande.statut === 'VALIDEE' || demande.statut === 'REJETEE') {
+    if (this.isVerifiedStatus(demande.statut) || demande.statut === 'REJETEE') {
       return 100;
-    }
-
-    if (demande.statut === 'A_COMPLETER') {
-      return 75;
     }
 
     if (demande.statut === 'EN_COURS') {
@@ -363,7 +350,7 @@ export class AgentDemandesComponent implements OnInit {
 
   protected hasInstructionStarted(demande: DemandeResponse): boolean {
     const workflow = this.ensureWorkflowState(demande);
-    return demande.statut === 'EN_COURS' || demande.statut === 'A_COMPLETER' || workflow.instructionStartedAt !== null;
+    return demande.statut === 'EN_COURS' || workflow.instructionStartedAt !== null;
   }
 
   protected trackChecklistProgress(): void {
@@ -395,22 +382,22 @@ export class AgentDemandesComponent implements OnInit {
   }
 
   protected canSetInProgress(demande: DemandeResponse): boolean {
-    return ['EN_ATTENTE', 'A_COMPLETER'].includes(demande.statut);
-  }
-
-  protected canRequestCompletion(demande: DemandeResponse): boolean {
-    return demande.statut === 'EN_COURS';
+    return false;
   }
 
   protected canValidate(demande: DemandeResponse): boolean {
-    return ['EN_COURS', 'A_COMPLETER'].includes(demande.statut);
+    return demande.statut === 'EN_COURS';
   }
 
   protected canReject(demande: DemandeResponse): boolean {
-    return ['EN_COURS', 'A_COMPLETER'].includes(demande.statut);
+    return demande.statut === 'EN_COURS';
   }
 
   private countByStatus(status: AgentStatusFilter): number {
+    if (status === 'VALIDEE') {
+      return this.demandes.filter((demande) => this.isVerifiedStatus(demande.statut)).length;
+    }
+
     return this.demandes.filter((demande) => demande.statut === status).length;
   }
 
@@ -423,26 +410,22 @@ export class AgentDemandesComponent implements OnInit {
     const state: AgentWorkflowState = {
       assignedAt: demande.traiteParNom ? demande.updatedAt ?? demande.createdAt ?? null : null,
       instructionStartedAt: demande.statut === 'EN_COURS' ? demande.updatedAt ?? demande.createdAt ?? null : null,
-      completionRequestedAt: demande.statut === 'A_COMPLETER' ? demande.updatedAt ?? null : null,
-      lastDecisionAt: ['VALIDEE', 'REJETEE', 'A_COMPLETER'].includes(demande.statut)
+      lastDecisionAt: ['VALIDEE', 'VERIFIEE', 'REJETEE'].includes(demande.statut)
         ? demande.updatedAt ?? demande.createdAt ?? null
         : null,
       lastDecisionLabel:
-        demande.statut === 'VALIDEE'
+        this.isVerifiedStatus(demande.statut)
           ? 'Dossier validé'
           : demande.statut === 'REJETEE'
             ? 'Dossier rejeté'
-            : demande.statut === 'A_COMPLETER'
-              ? 'Compléments demandés'
-              : null,
+            : null,
       notes: '',
-      completionReason: '',
       rejectionReason: '',
       checklist: {
         identiteVerifiee: false,
         programmeEligible: false,
         piecesConformes: false,
-        analyseFinalisee: ['VALIDEE', 'REJETEE'].includes(demande.statut),
+        analyseFinalisee: ['VALIDEE', 'VERIFIEE', 'REJETEE'].includes(demande.statut),
       },
     };
 
@@ -450,13 +433,37 @@ export class AgentDemandesComponent implements OnInit {
     return state;
   }
 
-  private applyDemandePatch(id: number, patch: Partial<DemandeResponse>): void {
-    const updatedAt = new Date().toISOString();
-    this.demandes = this.demandes.map((demande) =>
-      demande.id === id ? { ...demande, ...patch, updatedAt } : demande,
-    );
-    const currentPatch = this.demandePatches.get(id) ?? { id };
-    this.demandePatches.set(id, { ...currentPatch, ...patch, updatedAt });
+  private matchesSelectedStatus(status: string): boolean {
+    if (this.selectedStatus === 'ALL') {
+      return true;
+    }
+
+    if (this.selectedStatus === 'VALIDEE') {
+      return this.isVerifiedStatus(status);
+    }
+
+    return status === this.selectedStatus;
+  }
+
+  private isVerifiedStatus(status: string): boolean {
+    return status === 'VALIDEE' || status === 'VERIFIEE';
+  }
+
+  private applyServerDemandeUpdate(
+    id: number,
+    patch: Partial<DemandeResponse>,
+    updatedDemande?: DemandeResponse,
+  ): void {
+    const currentDemande = this.demandes.find((demande) => demande.id === id);
+    if (!currentDemande) {
+      return;
+    }
+
+    const mergedDemande = updatedDemande
+      ? { ...currentDemande, ...updatedDemande }
+      : { ...currentDemande, ...patch, updatedAt: new Date().toISOString() };
+
+    this.demandes = this.demandes.map((demande) => (demande.id === id ? mergedDemande : demande));
     this.syncSelectedDemande();
     this.persistLocalState();
   }
@@ -498,10 +505,7 @@ export class AgentDemandesComponent implements OnInit {
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (demandes) => {
-          this.demandes = demandes.map((demande) => {
-            const patch = this.demandePatches.get(demande.id);
-            return patch ? { ...demande, ...patch } : demande;
-          });
+          this.demandes = demandes;
           this.selectedDemande = this.demandes[0] ?? null;
           this.selectedDocuments = this.selectedDemande?.piecesJointes ?? [];
           this.selectedWorkflowState = this.selectedDemande ? this.ensureWorkflowState(this.selectedDemande) : null;
@@ -527,10 +531,6 @@ export class AgentDemandesComponent implements OnInit {
       AGENT_WORKFLOW_STORAGE_KEY,
       JSON.stringify(Object.fromEntries(this.workflowStates.entries())),
     );
-    storage.setItem(
-      AGENT_DEMANDE_PATCHES_STORAGE_KEY,
-      JSON.stringify(Object.fromEntries(this.demandePatches.entries())),
-    );
   }
 
   private restoreLocalState(): void {
@@ -552,18 +552,6 @@ export class AgentDemandesComponent implements OnInit {
       }
     }
 
-    const rawDemandePatches = storage.getItem(AGENT_DEMANDE_PATCHES_STORAGE_KEY);
-    if (rawDemandePatches) {
-      try {
-        const parsed = JSON.parse(rawDemandePatches) as Record<string, PersistedDemandePatch>;
-        this.demandePatches.clear();
-        Object.entries(parsed).forEach(([id, patch]) => {
-          this.demandePatches.set(Number(id), patch);
-        });
-      } catch {
-        storage.removeItem(AGENT_DEMANDE_PATCHES_STORAGE_KEY);
-      }
-    }
   }
 
   private getStorage(): Storage | null {

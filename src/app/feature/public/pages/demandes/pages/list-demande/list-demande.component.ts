@@ -12,6 +12,14 @@ import {
 import { DemandesApiService } from '../../services/demandes-api.service';
 import { ProgrammeService } from '../../../programme/services/programme.service';
 
+interface CitizenTimelineStep {
+  label: string;
+  icon: string;
+  circleClass: string;
+  labelClass: string;
+  connectorClass?: string;
+}
+
 @Component({
   selector: 'app-list-demande',
   standalone: true,
@@ -53,6 +61,22 @@ export class ListDemandeComponent implements OnInit {
   }
 
   protected getStatusLabel(status: string): string {
+    switch (status) {
+      case 'EN_ATTENTE':
+        return 'Dépôt';
+      case 'EN_COURS':
+        return 'Instruction';
+      case 'VALIDEE':
+      case 'VERIFIEE':
+        return 'Validation';
+      case 'REJETEE':
+        return 'Rejetée';
+      default:
+        return getDemandeStatusLabel(status);
+    }
+  }
+
+  protected getListStatusLabel(status: string): string {
     return getDemandeStatusLabel(status);
   }
 
@@ -60,10 +84,9 @@ export class ListDemandeComponent implements OnInit {
     const badgeClasses: Record<string, string> = {
       EN_ATTENTE: 'text-slate-700',
       EN_COURS: 'text-amber-700',
-      A_COMPLETER: 'text-orange-700',
-      VALIDEE: 'text-sky-700',
-      REJETEE: 'text-rose-700',
-      CLOTUREE: 'text-emerald-700',
+      VALIDEE: 'text-emerald-700',
+      VERIFIEE: 'text-emerald-700',
+      REJETEE: 'text-red-700',
     };
 
     return badgeClasses[status] ?? 'text-slate-700';
@@ -89,8 +112,8 @@ export class ListDemandeComponent implements OnInit {
   }
 
   protected getProgrammeCategory(demande: DemandeResponse | null | undefined): string {
-    if (demande?.programme?.category) {
-      return demande.programme.category;
+    if (demande?.programme?.categorieNom) {
+      return demande.programme.categorieNom;
     }
 
     const programmeId = demande?.programmeId;
@@ -120,20 +143,132 @@ export class ListDemandeComponent implements OnInit {
     }).format(date);
   }
 
-  protected getStepFromStatus(status: string): number {
-    switch (status) {
-      case 'EN_COURS':
-      case 'A_COMPLETER':
-        return 2;
-      case 'VALIDEE':
-      case 'REJETEE':
-        return 3;
-      case 'CLOTUREE':
-        return 4;
-      case 'EN_ATTENTE':
-      default:
-        return 1;
+  protected getTimelineSteps(status: string): CitizenTimelineStep[] {
+    if (status === 'REJETEE') {
+      return [
+        {
+          label: 'Dépôt',
+          icon: 'fas fa-folder-open',
+          circleClass: 'bg-emerald-600 text-white',
+          labelClass: 'text-slate-900',
+          connectorClass: 'bg-emerald-600',
+        },
+        {
+          label: 'Instruction',
+          icon: 'fas fa-search',
+          circleClass: 'bg-emerald-600 text-white',
+          labelClass: 'text-slate-900',
+          connectorClass: 'bg-red-500',
+        },
+        {
+          label: 'Rejetée',
+          icon: 'fas fa-xmark',
+          circleClass: 'bg-red-500 text-white',
+          labelClass: 'text-red-600',
+          connectorClass: 'bg-gray-100',
+        },
+        {
+          label: 'Terminée',
+          icon: 'fas fa-flag-checkered',
+          circleClass: 'bg-gray-100 text-gray-400',
+          labelClass: 'text-gray-400',
+        },
+      ];
     }
+
+    if (status === 'VALIDEE' || status === 'VERIFIEE') {
+      return [
+        {
+          label: 'Dépôt',
+          icon: 'fas fa-folder-open',
+          circleClass: 'bg-emerald-600 text-white',
+          labelClass: 'text-slate-900',
+          connectorClass: 'bg-emerald-600',
+        },
+        {
+          label: 'Instruction',
+          icon: 'fas fa-search',
+          circleClass: 'bg-emerald-600 text-white',
+          labelClass: 'text-slate-900',
+          connectorClass: 'bg-emerald-600',
+        },
+        {
+          label: 'Validation',
+          icon: 'fas fa-file-signature',
+          circleClass: 'bg-emerald-600 text-white',
+          labelClass: 'text-emerald-700',
+          connectorClass: 'bg-gray-100',
+        },
+        {
+          label: 'Terminée',
+          icon: 'fas fa-flag-checkered',
+          circleClass: 'bg-gray-100 text-gray-400',
+          labelClass: 'text-gray-400',
+        },
+      ];
+    }
+
+    if (status === 'EN_COURS') {
+      return [
+        {
+          label: 'Dépôt',
+          icon: 'fas fa-folder-open',
+          circleClass: 'bg-emerald-600 text-white',
+          labelClass: 'text-slate-900',
+          connectorClass: 'bg-emerald-600',
+        },
+        {
+          label: 'Instruction',
+          icon: 'fas fa-search',
+          circleClass: 'border-4 border-emerald-600 bg-white text-emerald-600',
+          labelClass: 'text-emerald-700',
+          connectorClass: 'bg-gray-100',
+        },
+        {
+          label: 'Validation',
+          icon: 'fas fa-file-signature',
+          circleClass: 'bg-gray-100 text-gray-400',
+          labelClass: 'text-gray-400',
+          connectorClass: 'bg-gray-100',
+        },
+        {
+          label: 'Terminée',
+          icon: 'fas fa-flag-checkered',
+          circleClass: 'bg-gray-100 text-gray-400',
+          labelClass: 'text-gray-400',
+        },
+      ];
+    }
+
+    return [
+      {
+        label: 'Dépôt',
+        icon: 'fas fa-folder-open',
+        circleClass: 'border-4 border-emerald-600 bg-white text-emerald-600',
+        labelClass: 'text-emerald-700',
+        connectorClass: 'bg-gray-100',
+      },
+      {
+        label: 'Instruction',
+        icon: 'fas fa-search',
+        circleClass: 'bg-gray-100 text-gray-400',
+        labelClass: 'text-gray-400',
+        connectorClass: 'bg-gray-100',
+      },
+      {
+        label: 'Validation',
+        icon: 'fas fa-file-signature',
+        circleClass: 'bg-gray-100 text-gray-400',
+        labelClass: 'text-gray-400',
+        connectorClass: 'bg-gray-100',
+      },
+      {
+        label: 'Terminée',
+        icon: 'fas fa-flag-checkered',
+        circleClass: 'bg-gray-100 text-gray-400',
+        labelClass: 'text-gray-400',
+      },
+    ];
   }
 
   protected getFileNameOnly(document: DemandePieceJointe): string {

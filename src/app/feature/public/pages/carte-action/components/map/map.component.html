@@ -99,9 +99,12 @@
             </div>
           </div>
 
-          <app-leaflet-map *ngIf="viewMode === 'map'"></app-leaflet-map>
+          @if (viewMode === 'map') {
+            <app-leaflet-map></app-leaflet-map>
+          }
 
-          <div *ngIf="viewMode === 'list'" class="p-6">
+          @if (viewMode === 'list') {
+          <div class="p-6">
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
               <div class="overflow-x-auto">
                 <table class="w-full">
@@ -314,6 +317,7 @@
               </div>
             </div>
           </div>
+          }
         </div>
       </div>
     </div>
