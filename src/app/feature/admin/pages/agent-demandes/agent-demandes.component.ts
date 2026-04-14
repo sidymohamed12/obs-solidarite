@@ -482,7 +482,7 @@ export class AgentDemandesComponent implements OnInit {
 
         programmes.forEach((programme) => {
           this.programmeTitles.set(Number(programme.id), programme.titre);
-          this.programmeCategories.set(Number(programme.id), programme.category);
+          this.programmeCategories.set(Number(programme.id), programme.categorieNom);
         });
       },
     });

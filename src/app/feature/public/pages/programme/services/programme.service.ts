@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { API_ENDPOINTS } from '../../../../../core/config/api.config';
-import { Programme } from '../../../models/programme.model';
+import { Programme, ProgrammeCategory } from '../../../models/programme.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,15 +20,16 @@ export class ProgrammeService {
     );
   }
 
-  getProgramById(id: number | string): Observable<Programme | undefined> {
-    return this.getPrograms().pipe(
-      map((programmes) => programmes.find((programme) => programme.id === Number(id))),
+  getCategories(): Observable<string[]> {
+    return this.http.get<ProgrammeCategory[]>(API_ENDPOINTS.categories.base).pipe(
+      map((categories) => categories.filter((category) => category.active).map((category) => category.nom)),
+      map((categories) => [...new Set(categories)]),
     );
   }
 
-  getProgramsByCategory(category: string): Observable<Programme[]> {
+  getProgramById(id: number | string): Observable<Programme | undefined> {
     return this.getPrograms().pipe(
-      map((programmes) => programmes.filter((programme) => programme.category === category)),
+      map((programmes) => programmes.find((programme) => programme.id === Number(id))),
     );
   }
 

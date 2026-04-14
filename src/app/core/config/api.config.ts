@@ -1,6 +1,6 @@
 const normalizeBaseUrl = (value: string | undefined): string => {
   if (!value) {
-    return 'http://localhost:8080';
+    return 'http://localhost:8085';
   }
 
   return value.replace(/\/$/, '');
@@ -29,7 +29,12 @@ export const API_ENDPOINTS = {
     downloadDocument: (id: number | string, documentId: number | string) =>
       `${API_BASE_URL}/api/v1/web/citoyen/demandes/${id}/documents/${documentId}/download`,
   },
+  categories: {
+    base: `${API_BASE_URL}/api/v1/web/categories`,
+  },
   programmes: {
     base: `${API_BASE_URL}/api/v1/web/programmes`,
+    byCategory: (category: string) =>
+      `${API_BASE_URL}/api/v1/web/programmes?category=${encodeURIComponent(category)}`,
   },
 };
