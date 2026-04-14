@@ -13,13 +13,17 @@
     </div>
   </header>
 
-  <div *ngIf="errorMessage" class="mb-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-    {{ errorMessage }}
-  </div>
+  @if (errorMessage) {
+    <div class="mb-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+      {{ errorMessage }}
+    </div>
+  }
 
-  <div *ngIf="infoMessage()" class="mb-5 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-700">
-    {{ infoMessage() }}
-  </div>
+  @if (infoMessage()) {
+    <div class="mb-5 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-700">
+      {{ infoMessage() }}
+    </div>
+  }
 
   <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
     <button
@@ -63,10 +67,8 @@
           <option value="ALL">Tous les statuts</option>
           <option value="EN_ATTENTE">En attente</option>
           <option value="EN_COURS">En cours</option>
-          <option value="A_COMPLETER">À compléter</option>
           <option value="VALIDEE">Validée</option>
           <option value="REJETEE">Rejetée</option>
-          <option value="CLOTUREE">Clôturée</option>
         </select>
       </div>
 
@@ -111,13 +113,16 @@
           <p class="text-sm text-slate-500">Choisissez le dossier à instruire.</p>
         </div>
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-slate-500">
-          {{ filteredDemandes.length }} résultat(s)
+          {{ filteredDemandes.length }} demandes
         </span>
       </div>
 
-      <div *ngIf="loading" class="px-5 py-10 text-center text-slate-500">Chargement des demandes...</div>
+      @if (loading) {
+        <div class="px-5 py-10 text-center text-slate-500">Chargement des demandes...</div>
+      }
 
-      <div *ngIf="!loading" class="max-h-[78vh] overflow-y-auto px-3 py-3">
+      @if (!loading) {
+        <div class="max-h-[78vh] overflow-y-auto px-3 py-3">
         <button
           *ngFor="let demande of filteredDemandes"
           type="button"
@@ -146,10 +151,13 @@
           </div>
         </button>
 
-        <div *ngIf="filteredDemandes.length === 0" class="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-slate-500">
-          Aucun dossier ne correspond aux filtres courants.
-        </div>
+        @if (filteredDemandes.length === 0) {
+          <div class="rounded-[1.75rem] border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-slate-500">
+            Aucun dossier ne correspond aux filtres courants.
+          </div>
+        }
       </div>
+      }
     </section>
 
     <aside class="min-w-0 rounded-4xl border border-slate-200 bg-white shadow-sm xl:min-h-[78vh]">
@@ -158,13 +166,18 @@
         <p class="text-sm text-slate-500">Lecture complète du dossier et des pièces transmises.</p>
       </div>
 
-      <div *ngIf="selectedLoading" class="px-5 py-10 text-center text-slate-500">Chargement du dossier...</div>
+      @if (selectedLoading) {
+        <div class="px-5 py-10 text-center text-slate-500">Chargement du dossier...</div>
+      }
 
-      <div *ngIf="!selectedLoading && !selectedDemande" class="px-5 py-10 text-center text-slate-500">
-        Sélectionnez une demande dans la liste.
-      </div>
+      @if (!selectedLoading && !selectedDemande) {
+        <div class="px-5 py-10 text-center text-slate-500">
+          Sélectionnez une demande dans la liste.
+        </div>
+      }
 
-      <div *ngIf="!selectedLoading && selectedDemande as currentDemande" class="max-h-[82vh] overflow-y-auto px-6 py-6 xl:px-8">
+      @if (!selectedLoading && selectedDemande; as currentDemande) {
+        <div class="max-h-[82vh] overflow-y-auto px-6 py-6 xl:px-8">
         <div class="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4">
           <span class="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.15em]" [ngClass]="getStatusBadgeClass(currentDemande.statut)">
             {{ getStatusLabel(currentDemande.statut) }}
@@ -194,30 +207,35 @@
             <span class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">{{ selectedDocuments.length }} fichier(s)</span>
           </div>
 
-          <div *ngIf="selectedDocuments.length === 0" class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
-            Aucun document disponible.
-          </div>
+          @if (selectedDocuments.length === 0) {
+            <div class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+              Aucun document disponible.
+            </div>
+          }
 
-          <div *ngIf="selectedDocuments.length > 0" class="mt-4 space-y-3">
-            <button
-              *ngFor="let document of selectedDocuments"
-              type="button"
-              (click)="downloadDocument(document)"
-              [disabled]="downloadingDocumentId === document.id"
-              class="flex w-full items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <div class="flex items-center gap-3 min-w-0">
-                <i class="fa-solid text-xl" [ngClass]="getFileIcon(document)"></i>
-                <div class="min-w-0">
-                  <p class="truncate font-semibold text-slate-900">{{ document.nomOriginal }}</p>
-                  <p class="text-xs text-slate-500">{{ getFileType(document) }}</p>
+          @if (selectedDocuments.length > 0) {
+            <div class="mt-4 space-y-3">
+              <button
+                *ngFor="let document of selectedDocuments"
+                type="button"
+                (click)="downloadDocument(document)"
+                [disabled]="downloadingDocumentId === document.id"
+                class="flex w-full items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <div class="flex items-center gap-3 min-w-0">
+                  <i class="fa-solid text-xl" [ngClass]="getFileIcon(document)"></i>
+                  <div class="min-w-0">
+                    <p class="truncate font-semibold text-slate-900">{{ document.nomOriginal }}</p>
+                    <p class="text-xs text-slate-500">{{ getFileType(document) }}</p>
+                  </div>
                 </div>
-              </div>
-              <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-300"></i>
-            </button>
-          </div>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-300"></i>
+              </button>
+            </div>
+          }
         </div>
-      </div>
+        </div>
+      }
     </aside>
 
     <aside class="min-w-0 rounded-4xl border border-slate-200 bg-white shadow-sm xl:min-h-[78vh]">
@@ -226,76 +244,70 @@
         <p class="text-sm text-slate-500">Analyse, motifs et actions de décision.</p>
       </div>
 
-      <div *ngIf="!selectedDemande" class="px-5 py-10 text-center text-slate-500">
-        Ouvrez un dossier pour afficher le poste de traitement.
-      </div>
+      @if (!selectedDemande) {
+        <div class="px-5 py-10 text-center text-slate-500">
+          Ouvrez un dossier pour afficher le poste de traitement.
+        </div>
+      }
 
-      <div *ngIf="selectedDemande as currentDemande" class="max-h-[82vh] overflow-y-auto px-5 py-5">
+      @if (selectedDemande; as currentDemande) {
+        <div class="max-h-[82vh] overflow-y-auto px-5 py-5">
         <div class="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4">
           <p class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Traitement</p>
           <p class="mt-1 text-sm font-semibold text-slate-900">Analyse, qualification et décision sur le dossier sélectionné</p>
         </div>
 
-        <div *ngIf="hasInstructionStarted(currentDemande) && selectedWorkflowState as workflow" class="mt-5 rounded-[1.75rem] border border-slate-200 p-4">
-          <div class="flex items-center justify-between gap-4">
-            <h4 class="text-sm font-black uppercase tracking-[0.18em] text-slate-400">Analyse agent</h4>
-            <span class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">En cours</span>
-          </div>
+        @if (hasInstructionStarted(currentDemande) && selectedWorkflowState; as workflow) {
+          <div class="mt-5 rounded-[1.75rem] border border-slate-200 p-4">
+            <div class="flex items-center justify-between gap-4">
+              <h4 class="text-sm font-black uppercase tracking-[0.18em] text-slate-400">Analyse agent</h4>
+              <span class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">En cours</span>
+            </div>
 
-          <div class="mt-4 grid gap-3">
-            <label class="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
-              <input [(ngModel)]="workflow.checklist.identiteVerifiee" (ngModelChange)="trackChecklistProgress()" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
-              Identité du citoyen vérifiée
-            </label>
-            <label class="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
-              <input [(ngModel)]="workflow.checklist.programmeEligible" (ngModelChange)="trackChecklistProgress()" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
-              Éligibilité au programme confirmée
-            </label>
-            <label class="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
-              <input [(ngModel)]="workflow.checklist.piecesConformes" (ngModelChange)="trackChecklistProgress()" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
-              Pièces jointes conformes et exploitables
-            </label>
-            <label class="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
-              <input [(ngModel)]="workflow.checklist.analyseFinalisee" (ngModelChange)="trackChecklistProgress()" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
-              Analyse finalisée par l'agent
-            </label>
-          </div>
+            <div class="mt-4 grid gap-3">
+              <label class="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
+                <input [(ngModel)]="workflow.checklist.identiteVerifiee" (ngModelChange)="trackChecklistProgress()" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                Identité du citoyen vérifiée
+              </label>
+              <label class="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
+                <input [(ngModel)]="workflow.checklist.programmeEligible" (ngModelChange)="trackChecklistProgress()" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                Éligibilité au programme confirmée
+              </label>
+              <label class="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
+                <input [(ngModel)]="workflow.checklist.piecesConformes" (ngModelChange)="trackChecklistProgress()" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                Pièces jointes conformes et exploitables
+              </label>
+              <label class="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
+                <input [(ngModel)]="workflow.checklist.analyseFinalisee" (ngModelChange)="trackChecklistProgress()" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                Analyse finalisée par l'agent
+              </label>
+            </div>
 
-          <div class="mt-5">
-            <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-400">Notes d'instruction</label>
-            <textarea
-              [(ngModel)]="workflow.notes"
-              (ngModelChange)="persistWorkflowDraft()"
-              rows="7"
-              placeholder="Constats, vérifications, éléments à retenir pour la décision..."
-              class="min-h-40 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-emerald-500"
-            ></textarea>
-          </div>
-
-          <div class="mt-5 grid gap-4 lg:grid-cols-2">
-            <div class="rounded-3xl border border-orange-200 bg-orange-50/60 p-4">
-              <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-orange-600">Motif si compléments</label>
+            <div class="mt-5">
+              <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-400">Notes d'instruction</label>
               <textarea
-                [(ngModel)]="workflow.completionReason"
+                [(ngModel)]="workflow.notes"
                 (ngModelChange)="persistWorkflowDraft()"
-                rows="5"
-                placeholder="Pièces manquantes, précision à demander, document illisible..."
-                class="min-h-32 w-full rounded-[1.25rem] border border-orange-200 bg-white px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-orange-400"
+                rows="7"
+                placeholder="Constats, vérifications, éléments à retenir pour la décision..."
+                class="min-h-40 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-emerald-500"
               ></textarea>
             </div>
 
-            <div class="rounded-3xl border border-rose-200 bg-rose-50/60 p-4">
-              <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-rose-600">Motif si rejet</label>
-              <textarea
-                [(ngModel)]="workflow.rejectionReason"
-                (ngModelChange)="persistWorkflowDraft()"
-                rows="5"
-                placeholder="Inéligibilité, incohérence du dossier, demande non recevable..."
-                class="min-h-32 w-full rounded-[1.25rem] border border-rose-200 bg-white px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-rose-400"
-              ></textarea>
+            <div class="mt-5">
+              <div class="rounded-3xl border border-rose-200 bg-rose-50/60 p-4">
+                <label class="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-rose-600">Motif si rejet</label>
+                <textarea
+                  [(ngModel)]="workflow.rejectionReason"
+                  (ngModelChange)="persistWorkflowDraft()"
+                  rows="5"
+                  placeholder="Inéligibilité, incohérence du dossier, demande non recevable..."
+                  class="min-h-32 w-full rounded-[1.25rem] border border-rose-200 bg-white px-4 py-3 text-sm leading-7 text-slate-700 outline-none transition focus:border-rose-400"
+                ></textarea>
+              </div>
             </div>
           </div>
-        </div>
+        }
 
         <div class="mt-5 rounded-[1.75rem] border border-slate-200 bg-slate-950 p-4 text-white">
           <h4 class="text-sm font-black uppercase tracking-[0.18em] text-slate-400">Actions agent</h4>
@@ -303,32 +315,16 @@
             <button
               type="button"
               (click)="executeWorkflowAction('PRISE_EN_CHARGE')"
-              [disabled]="!canTakeInCharge(currentDemande)"
+              [disabled]="actionLoading || !canTakeInCharge(currentDemande)"
               class="rounded-2xl border border-white/10 px-4 py-3 text-left text-sm font-semibold transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Prendre en charge
-            </button>
-            <button
-              type="button"
-              (click)="executeWorkflowAction('EN_COURS')"
-              [disabled]="!canSetInProgress(currentDemande)"
-              class="rounded-2xl border border-white/10 px-4 py-3 text-left text-sm font-semibold transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Passer en instruction
-            </button>
-            <button
-              type="button"
-              (click)="executeWorkflowAction('A_COMPLETER')"
-              [disabled]="!canRequestCompletion(currentDemande)"
-              class="rounded-2xl border border-white/10 px-4 py-3 text-left text-sm font-semibold transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Demander des compléments
             </button>
             <div class="grid gap-3 sm:grid-cols-2">
               <button
                 type="button"
                 (click)="executeWorkflowAction('VALIDEE')"
-                [disabled]="!canValidate(currentDemande)"
+                [disabled]="actionLoading || !canValidate(currentDemande)"
                 class="rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Valider
@@ -336,7 +332,7 @@
               <button
                 type="button"
                 (click)="executeWorkflowAction('REJETEE')"
-                [disabled]="!canReject(currentDemande)"
+                [disabled]="actionLoading || !canReject(currentDemande)"
                 class="rounded-2xl bg-rose-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Rejeter
@@ -344,7 +340,8 @@
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      }
     </aside>
   </section>
 </section>

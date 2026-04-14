@@ -14,19 +14,26 @@
     </p>
   </header>
 
-  <div *ngIf="errorMessage" class="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-    {{ errorMessage }}
-  </div>
+  @if (errorMessage) {
+    <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+  }
 
-  <div *ngIf="successMessage" class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-    {{ successMessage }}
-  </div>
+  @if (successMessage) {
+    <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+      {{ successMessage }}
+    </div>
+  }
 
-  <section *ngIf="loading" class="rounded-4xl border border-slate-100 bg-white px-6 py-10 text-center text-slate-500 shadow-sm">
-    Chargement des demandes...
-  </section>
+  @if (loading) {
+    <section class="rounded-4xl border border-slate-100 bg-white px-6 py-10 text-center text-slate-500 shadow-sm">
+      Chargement des demandes...
+    </section>
+  }
 
-  <div *ngIf="!loading" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+  @if (!loading) {
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
     <aside class="lg:col-span-4 space-y-6">
       <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
         <h3 class="font-bold text-lg mb-4">Rechercher un dossier</h3>
@@ -77,13 +84,15 @@
             </p>
             <p class="text-sm font-bold">{{ demande.numero }}</p>
             <p class="text-[11px] font-medium mt-1 uppercase" [ngClass]="getStatusBadgeClass(demande.statut)">
-              {{ getStatusLabel(demande.statut) }}
+              {{ getListStatusLabel(demande.statut) }}
             </p>
           </button>
 
-          <div *ngIf="filteredDemandes.length === 0" class="rounded-2xl border border-dashed border-gray-200 px-4 py-6 text-center text-sm text-gray-400">
-            Aucun dossier trouvé.
-          </div>
+          @if (filteredDemandes.length === 0) {
+            <div class="rounded-2xl border border-dashed border-gray-200 px-4 py-6 text-center text-sm text-gray-400">
+              Aucun dossier trouvé.
+            </div>
+          }
         </div>
 
         <div class="mt-4 pt-4 border-t border-dashed border-gray-100 shrink-0">
@@ -98,17 +107,19 @@
     </aside>
 
     <div class="lg:col-span-8 space-y-6">
-      <section *ngIf="selectedLoading" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-10 text-center text-slate-500">
-        Chargement du dossier sélectionné...
-      </section>
+      @if (selectedLoading) {
+        <section class="bg-white rounded-3xl shadow-sm border border-gray-100 p-10 text-center text-slate-500">
+          Chargement du dossier sélectionné...
+        </section>
+      }
 
-      <ng-container *ngIf="!selectedLoading && selectedDemande as currentDemande">
+      @if (!selectedLoading && selectedDemande; as currentDemande) {
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="p-6 sm:p-10 border-b border-gray-50 flex flex-wrap justify-between items-center gap-4">
             <div>
-              <span class="px-4 py-1.5 rounded-full text-xs font-bold uppercase" [ngClass]="getStatusBadgeClass(currentDemande.statut)">
+              <!-- <span class="px-4 py-1.5 rounded-full text-xs font-bold uppercase" [ngClass]="getStatusBadgeClass(currentDemande.statut)">
                 {{ getStatusLabel(currentDemande.statut) }}
-              </span>
+              </span> -->
               <h2 class="text-2xl font-bold mt-2">Dossier n° {{ currentDemande.numero }}</h2>
               <p class="text-gray-400 text-sm">
                 Déposé le {{ formatDate(currentDemande.createdAt) }} • {{ getProgrammeCategory(currentDemande) }}
@@ -123,84 +134,69 @@
           </div>
 
           <div class="p-10 bg-white">
-            <div class="relative flex flex-col md:flex-row justify-between gap-10 md:gap-4">
-              <div class="hidden md:block absolute top-6 left-0 w-full h-1 bg-gray-100 -translate-y-1/2"></div>
+            <div class="flex flex-col gap-8 md:flex-row md:items-start md:gap-0">
+              <ng-container *ngFor="let step of getTimelineSteps(currentDemande.statut); let last = last">
+                <div class="relative flex flex-1 items-center gap-4 md:flex-col md:text-center">
+                  <div
+                    [ngClass]="step.circleClass"
+                    class="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-sm"
+                  >
+                    <i [class]="step.icon"></i>
+                  </div>
+                  <p [ngClass]="step.labelClass" class="font-bold text-sm">{{ step.label }}</p>
 
-              <div class="flex flex-row md:flex-col items-center gap-4 md:text-center z-10">
-                <div
-                  [ngClass]="getStepFromStatus(currentDemande.statut) >= 1 ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-400'"
-                  class="w-12 h-12 rounded-full flex items-center justify-center ring-8 ring-white shadow-sm"
-                >
-                  <i class="fas fa-folder-open"></i>
+                  @if (!last) {
+                    <div
+                      [ngClass]="step.connectorClass"
+                      class="absolute left-1/2 top-6 hidden h-1 w-full -translate-y-1/2 rounded-full md:block"
+                    ></div>
+                  }
                 </div>
-                <p class="font-bold text-sm">Dépôt</p>
-              </div>
-
-              <div class="flex flex-row md:flex-col items-center gap-4 md:text-center z-10">
-                <div
-                  [ngClass]="{
-                    'bg-emerald-600 text-white': getStepFromStatus(currentDemande.statut) > 2,
-                    'border-4 border-emerald-600 text-emerald-600 animate-pulse bg-white': getStepFromStatus(currentDemande.statut) === 2,
-                    'bg-gray-100 text-gray-400': getStepFromStatus(currentDemande.statut) < 2,
-                  }"
-                  class="w-12 h-12 rounded-full flex items-center justify-center ring-8 ring-white"
-                >
-                  <i class="fas fa-search"></i>
-                </div>
-                <p class="font-bold text-sm">Instruction</p>
-              </div>
-
-              <div class="flex flex-row md:flex-col items-center gap-4 md:text-center z-10">
-                <div
-                  [ngClass]="getStepFromStatus(currentDemande.statut) >= 3 ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-400'"
-                  class="w-12 h-12 rounded-full flex items-center justify-center ring-8 ring-white"
-                >
-                  <i class="fas fa-file-signature"></i>
-                </div>
-                <p class="font-bold text-sm">Validation</p>
-              </div>
-
-              <div class="flex flex-row md:flex-col items-center gap-4 md:text-center z-10">
-                <div
-                  [ngClass]="getStepFromStatus(currentDemande.statut) === 4 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'"
-                  class="w-12 h-12 rounded-full flex items-center justify-center ring-8 ring-white"
-                >
-                  <i class="fas fa-flag-checkered"></i>
-                </div>
-                <p class="font-bold text-sm">Terminé</p>
-              </div>
+              </ng-container>
             </div>
           </div>
         </div>
 
+        @if (currentDemande.statut === 'REJETEE') {
+          <div
+            class="bg-white p-6 rounded-3xl border border-red-100 shadow-sm"
+          >
+            <h3 class="font-bold text-lg text-red-700 mb-4">Motif du rejet</h3>
+            <p class="rounded-2xl bg-red-50 px-4 py-4 text-sm leading-6 text-red-700">
+              {{ currentDemande.motifRejet || 'Le motif du rejet n\'a pas encore été communiqué.' }}
+            </p>
+          </div>
+        }
+
         <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
           <h3 class="font-bold text-lg mb-4">Documents transmis</h3>
 
-          <div *ngIf="selectedDocuments.length > 0; else noDocs" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button
-              *ngFor="let doc of selectedDocuments"
-              type="button"
-              (click)="downloadDocument(doc)"
-              [disabled]="downloadingDocumentId === doc.id"
-              class="flex items-center justify-between p-4 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all group cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              <div class="flex items-center gap-3 min-w-0">
-                <i class="fas text-2xl transition-transform group-hover:scale-110" [ngClass]="getFileIcon(doc)"></i>
-                <div class="flex flex-col min-w-0 text-left">
-                  <span class="text-sm font-semibold text-gray-700 truncate">{{ getFileNameOnly(doc) }}</span>
-                  <span class="text-xs text-gray-400">{{ getFileType(doc) }}</span>
+          @if (selectedDocuments.length > 0) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                *ngFor="let doc of selectedDocuments"
+                type="button"
+                (click)="downloadDocument(doc)"
+                [disabled]="downloadingDocumentId === doc.id"
+                class="flex items-center justify-between p-4 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all group cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <div class="flex items-center gap-3 min-w-0">
+                  <i class="fas text-2xl transition-transform group-hover:scale-110" [ngClass]="getFileIcon(doc)"></i>
+                  <div class="flex flex-col min-w-0 text-left">
+                    <span class="text-sm font-semibold text-gray-700 truncate">{{ getFileNameOnly(doc) }}</span>
+                    <span class="text-xs text-gray-400">{{ getFileType(doc) }}</span>
+                  </div>
                 </div>
-              </div>
 
-              <i class="fas fa-external-link-alt text-gray-300 group-hover:text-blue-500 transition-colors text-xs"></i>
-            </button>
-          </div>
-
-          <ng-template #noDocs>
+                <i class="fas fa-external-link-alt text-gray-300 group-hover:text-blue-500 transition-colors text-xs"></i>
+              </button>
+            </div>
+          } @else {
             <p class="text-gray-400 italic text-sm text-center py-4">Aucun document transmis.</p>
-          </ng-template>
+          }
         </div>
-      </ng-container>
+      }
     </div>
   </div>
+  }
 </main>

@@ -1,10 +1,9 @@
 export type DemandeStatut =
   | 'EN_ATTENTE'
   | 'EN_COURS'
-  | 'A_COMPLETER'
   | 'VALIDEE'
-  | 'REJETEE'
-  | 'CLOTUREE';
+  | 'VERIFIEE'
+  | 'REJETEE';
 
 export interface DemandePayload {
   prenom: string;
@@ -28,7 +27,7 @@ export interface DemandePieceJointe {
 export interface DemandeProgrammeSummary {
   id: number;
   titre: string;
-  category: string;
+  categorieNom: string;
   description: string;
   image: string;
   active: boolean;
@@ -50,6 +49,7 @@ export interface DemandeResponse {
   programmeId?: number;
   programme?: DemandeProgrammeSummary | null;
   motif?: string;
+  motifRejet?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -62,6 +62,10 @@ export interface DemandeFormValue {
   region: string;
   commune: string;
   programmeId: number | null;
+  motif: string;
+}
+
+export interface DemandeRejectPayload {
   motif: string;
 }
 
@@ -107,19 +111,17 @@ export const DEMANDE_COMMUNES_BY_REGION: Record<string, string[]> = {
 const STATUS_LABELS: Record<string, string> = {
   EN_ATTENTE: 'En attente',
   EN_COURS: 'En cours',
-  A_COMPLETER: 'Pièces à compléter',
   VALIDEE: 'Validée',
+  VERIFIEE: 'Validée',
   REJETEE: 'Rejetée',
-  CLOTUREE: 'Clôturée',
 };
 
 const STATUS_BADGES: Record<string, string> = {
   EN_ATTENTE: 'bg-amber-100 text-amber-800',
   EN_COURS: 'bg-sky-100 text-sky-800',
-  A_COMPLETER: 'bg-rose-100 text-rose-800',
   VALIDEE: 'bg-emerald-100 text-emerald-800',
+  VERIFIEE: 'bg-emerald-100 text-emerald-800',
   REJETEE: 'bg-slate-200 text-slate-700',
-  CLOTUREE: 'bg-violet-100 text-violet-800',
 };
 
 export const getDemandeStatusLabel = (status: string): string => STATUS_LABELS[status] ?? status;

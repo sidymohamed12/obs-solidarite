@@ -29,8 +29,8 @@
 					<i class="fa-solid fa-chevron-down text-xs text-slate-400 transition" [class.rotate-180]="profileMenuOpen()"></i>
 				</button>
 
+				@if (profileMenuOpen()) {
 				<div
-					*ngIf="profileMenuOpen()"
 					class="absolute right-0 mt-3 w-72 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10"
 				>
 					<div class="border-b border-slate-100 px-5 py-4">
@@ -55,6 +55,7 @@
 						</button>
 					</div>
 				</div>
+				}
 			</div>
 		</div>
 	</nav>

@@ -24,6 +24,10 @@ export const API_ENDPOINTS = {
     base: `${API_BASE_URL}/api/v1/web/citoyen/demandes`,
     agentBase: `${API_BASE_URL}/api/v1/web/agent/demandes`,
     byId: (id: number | string) => `${API_BASE_URL}/api/v1/web/citoyen/demandes/${id}`,
+    takeInCharge: (id: number | string) =>
+      `${API_BASE_URL}/api/v1/web/agent/demandes/${id}/prendre-en-charge`,
+    verify: (id: number | string) => `${API_BASE_URL}/api/v1/web/agent/demandes/${id}/vérifier`,
+    reject: (id: number | string) => `${API_BASE_URL}/api/v1/web/agent/demandes/${id}/rejeter`,
     documents: (id: number | string) =>
       `${API_BASE_URL}/api/v1/web/citoyen/demandes/${id}/documents`,
     downloadDocument: (id: number | string, documentId: number | string) =>

@@ -94,15 +94,16 @@
         </div>
 
         <!-- Erreur API -->
-        <div
-          *ngIf="auth.error()"
-          class="mb-4 sm:mb-5 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 sm:p-4 text-xs sm:text-sm animate-fadeInUp"
-        >
-          <svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span>{{ auth.error() }}</span>
-        </div>
+        @if (auth.error()) {
+          <div
+            class="mb-4 sm:mb-5 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 sm:p-4 text-xs sm:text-sm animate-fadeInUp"
+          >
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>{{ auth.error() }}</span>
+          </div>
+        }
 
         <!-- Formulaire -->
         <form
@@ -121,7 +122,9 @@
                 class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
                 [class.border-red-400]="fieldError('prenom')"
               />
-              <p *ngIf="fieldError('prenom')" class="mt-1 text-xs text-red-500">Prénom requis (min. 2 car.)</p>
+              @if (fieldError('prenom')) {
+                <p class="mt-1 text-xs text-red-500">Prénom requis (min. 2 car.)</p>
+              }
             </div>
             <div>
               <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Nom</label>
@@ -132,7 +135,9 @@
                 class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
                 [class.border-red-400]="fieldError('nom')"
               />
-              <p *ngIf="fieldError('nom')" class="mt-1 text-xs text-red-500">Nom requis (min. 2 car.)</p>
+              @if (fieldError('nom')) {
+                <p class="mt-1 text-xs text-red-500">Nom requis (min. 2 car.)</p>
+              }
             </div>
           </div>
 
@@ -151,7 +156,9 @@
                 [class.border-red-400]="fieldError('username')"
               />
             </div>
-            <p *ngIf="fieldError('username')" class="mt-1 text-xs text-red-500">Nom d'utilisateur requis (3–30 car.)</p>
+            @if (fieldError('username')) {
+              <p class="mt-1 text-xs text-red-500">Nom d'utilisateur requis (3–30 car.)</p>
+            }
           </div>
 
           <!-- Email -->
@@ -169,7 +176,9 @@
                 [class.border-red-400]="fieldError('email')"
               />
             </div>
-            <p *ngIf="fieldError('email')" class="mt-1 text-xs text-red-500">Email valide requis</p>
+            @if (fieldError('email')) {
+              <p class="mt-1 text-xs text-red-500">Email valide requis</p>
+            }
           </div>
 
           <!-- Mot de passe + Confirmation -->
@@ -188,7 +197,9 @@
                   [class.border-red-400]="fieldError('password')"
                 />
               </div>
-              <p *ngIf="fieldError('password')" class="mt-1 text-xs text-red-500">Min. 4 caractères</p>
+              @if (fieldError('password')) {
+                <p class="mt-1 text-xs text-red-500">Min. 4 caractères</p>
+              }
             </div>
             <div>
               <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Confirmation</label>
@@ -204,9 +215,11 @@
                   [class.border-red-400]="fieldError('confirmPassword') || (registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched)"
                 />
               </div>
-              <p *ngIf="registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched" class="mt-1 text-xs text-red-500">
-                Mots de passe différents
-              </p>
+              @if (registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched) {
+                <p class="mt-1 text-xs text-red-500">
+                  Mots de passe différents
+                </p>
+              }
             </div>
           </div>
 
@@ -226,7 +239,9 @@
                   [class.border-red-400]="fieldError('phoneNumber')"
                 />
               </div>
-              <p *ngIf="fieldError('phoneNumber')" class="mt-1 text-xs text-red-500">Numéro invalide</p>
+              @if (fieldError('phoneNumber')) {
+                <p class="mt-1 text-xs text-red-500">Numéro invalide</p>
+              }
             </div>
             <div>
               <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Code PIN <span class="text-gray-400 font-normal">(4 chiffres)</span></label>
@@ -243,7 +258,9 @@
                   [class.border-red-400]="fieldError('codePin')"
                 />
               </div>
-              <p *ngIf="fieldError('codePin')" class="mt-1 text-xs text-red-500">4 chiffres requis</p>
+              @if (fieldError('codePin')) {
+                <p class="mt-1 text-xs text-red-500">4 chiffres requis</p>
+              }
             </div>
           </div>
 
@@ -253,10 +270,12 @@
             [disabled]="registerForm.invalid || auth.loading()"
             class="w-full bg-[#047857] hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-3.5 text-sm sm:text-base rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 mt-1"
           >
-            <svg *ngIf="auth.loading()" class="animate-spin w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-            </svg>
+            @if (auth.loading()) {
+              <svg class="animate-spin w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+            }
             <span>{{ auth.loading() ? 'Création du compte...' : 'Créer mon compte' }}</span>
           </button>
         </form>

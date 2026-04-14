@@ -2,7 +2,12 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_ENDPOINTS } from '../../../../../core/config/api.config';
-import { DemandePayload, DemandePieceJointe, DemandeResponse } from '../models/demande.model';
+import {
+  DemandePayload,
+  DemandePieceJointe,
+  DemandeRejectPayload,
+  DemandeResponse,
+} from '../models/demande.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +25,18 @@ export class DemandesApiService {
 
   getDemande(id: number | string): Observable<DemandeResponse> {
     return this.http.get<DemandeResponse>(API_ENDPOINTS.demandes.byId(id));
+  }
+
+  takeInChargeDemande(id: number | string): Observable<DemandeResponse> {
+    return this.http.patch<DemandeResponse>(API_ENDPOINTS.demandes.takeInCharge(id), null);
+  }
+
+  verifyDemande(id: number | string): Observable<DemandeResponse> {
+    return this.http.patch<DemandeResponse>(API_ENDPOINTS.demandes.verify(id), null);
+  }
+
+  rejectDemande(id: number | string, payload: DemandeRejectPayload): Observable<DemandeResponse> {
+    return this.http.patch<DemandeResponse>(API_ENDPOINTS.demandes.reject(id), payload);
   }
 
   createDemande(payload: DemandePayload): Observable<DemandeResponse> {
