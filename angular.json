@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "obs-solidarite": {
+    "TAXAWU": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:service": {
@@ -36,6 +36,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "allowedCommonJsDependencies": ["leaflet"],
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
@@ -45,12 +46,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.css"],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "styles": ["node_modules/leaflet/dist/leaflet.css", "src/styles.css"]
           },
           "configurations": {
             "production": {
@@ -80,10 +76,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "obs-solidarite:build:production"
+              "buildTarget": "TAXAWU:build:production"
             },
             "development": {
-              "buildTarget": "obs-solidarite:build:development"
+              "buildTarget": "TAXAWU:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -102,7 +98,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.css"]
+            "styles": ["node_modules/leaflet/dist/leaflet.css", "src/styles.css"]
           }
         }
       }

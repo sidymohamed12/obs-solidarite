@@ -1,0 +1,105 @@
+<div class="bg-gray-50 antialiased">
+  <main class="max-w-[2560px] mx-auto">
+    <section class="hero-video-container min-h-[85vh] flex items-center relative py-20">
+      <div class="absolute inset-0 hero-bg-image"></div>
+      <div
+        class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"
+      ></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid lg:grid-cols-12 gap-12 items-center">
+          <div class="lg:col-span-7 text-center lg:text-left">
+            <div
+              class="inline-flex items-center space-x-2 bg-green-500/20 backdrop-blur-md border border-green-500/30 px-4 py-2 rounded-full text-green-400 text-xs font-bold uppercase tracking-widest mb-8"
+            >
+              <i class="fas fa-satellite-dish animate-pulse"></i>
+              <span>Observatoire National en temps réel</span>
+            </div>
+
+            <h1
+              class="text-5xl md:text-6xl lg:text-6xl font-black text-white mb-8 tracking-tighter leading-[0.9] text-glow"
+            >
+              L'HUMAIN AU <br />
+              <span class="text-transparent bg-clip-text bg-green-400">CŒUR DES DONNÉES</span>
+            </h1>
+
+            <p class="text-xl md:text-2xl text-gray-200 mb-10 max-w-2xl font-light leading-relaxed">
+              Parce que derrière chaque point sur une carte se cache une famille, une école, une
+              vie. Découvrez comment nous transformons les chiffres en
+              <span class="text-white font-semibold">progrès social tangible</span>.
+            </p>
+
+            <div class="flex flex-wrap justify-center lg:justify-start gap-5">
+              <button
+                (click)="scrollToMap()"
+                class="px-10 py-5 bg-green-600 hover:bg-green-500 text-white rounded-2xl font-bold text-xl shadow-[0_20px_50px_rgba(22,_163,_74,_0.3)] transition-all transform hover:scale-105 flex items-center group"
+              >
+                <span>Explorer la Carte</span>
+                <i
+                  class="fas fa-arrow-right ml-3 group-hover:translate-x-2 transition-transform"
+                ></i>
+              </button>
+              <button
+                class="px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl font-bold text-xl hover:bg-white/20 transition-all"
+              >
+                Nos indicateurs
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 relative hidden lg:block">
+            <div class="floating-card">
+              <div
+                class="relative z-10 rounded-3xl overflow-hidden border border-white/20 shadow-2xl"
+              >
+                <img
+                  src="https://media.licdn.com/dms/image/v2/D4E22AQFAIgRVjIoJYg/feedshare-shrink_800/B4EZs7196CHcAg-/0/1766235599491?e=2147483647&v=beta&t=6uwqWl8wdJSlnHa2Iuq7sGdiom08CJmnorVUNXFUymw"
+                  alt="Sourire et Solidarité"
+                  class="w-full h-[500px] object-cover"
+                />
+
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"
+                ></div>
+
+                <div class="absolute bottom-0 left-0 right-0 p-8">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
+                      <p class="text-green-400 text-2xl font-bold">{{ stats.livesImpacted }}</p>
+                      <p class="text-white/70 text-xs uppercase tracking-tighter">Vies impactées</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
+                      <p class="text-yellow-400 text-2xl font-bold">{{ stats.regionsCovered }}</p>
+                      <p class="text-white/70 text-xs uppercase tracking-tighter">
+                        Régions couvertes
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="absolute -top-10 -right-10 w-64 h-64 bg-green-500/20 rounded-full blur-[100px]"
+              ></div>
+              <div
+                class="absolute -bottom-10 -left-10 w-64 h-64 bg-yellow-500/20 rounded-full blur-[100px]"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center text-white/40"
+      >
+        <span class="text-[10px] uppercase tracking-[0.3em] mb-2">Découvrir</span>
+        <div class="w-[1px] h-12 bg-gradient-to-b from-white/40 to-transparent"></div>
+      </div>
+    </section>
+
+    <app-map></app-map>
+    <!-- <app-regional-impact></app-regional-impact>
+        <app-featured-programs></app-featured-programs>
+        <app-cta-section></app-cta-section> -->
+  </main>
+</div>
