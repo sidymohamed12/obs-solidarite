@@ -32,7 +32,7 @@
             <div class="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/35 to-transparent"></div>
             <div class="absolute left-6 top-6">
               <span class="inline-flex rounded-full bg-white/90 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-700">
-                {{ currentProgramme.category }}
+                {{ currentProgramme.categorieNom }}
               </span>
             </div>
           </div>
@@ -54,7 +54,7 @@
                   Axe prioritaire
                 </p>
                 <p class="mt-3 text-2xl font-black text-slate-900">
-                  {{ getProgrammeFocus(currentProgramme.category) }}
+                  {{ getProgrammeFocus(currentProgramme.categorieNom) }}
                 </p>
               </article>
 
