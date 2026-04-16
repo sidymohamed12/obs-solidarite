@@ -22,7 +22,7 @@ export class ProgrammeService {
 
   getCategories(): Observable<string[]> {
     return this.http.get<ProgrammeCategory[]>(API_ENDPOINTS.categories.base).pipe(
-      map((categories) => categories.filter((category) => category.active).map((category) => category.nom)),
+      map((categories) => categories.map((category) => category.nom)),
       map((categories) => [...new Set(categories)]),
     );
   }

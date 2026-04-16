@@ -11,6 +11,7 @@ import {
 } from '../../models/demande.model';
 import { DemandesApiService } from '../../services/demandes-api.service';
 import { ProgrammeService } from '../../../programme/services/programme.service';
+import { Programme } from '../../../../models/programme.model';
 
 interface CitizenTimelineStep {
   label: string;
@@ -66,9 +67,10 @@ export class ListDemandeComponent implements OnInit {
         return 'Dépôt';
       case 'EN_COURS':
         return 'Instruction';
-      case 'VALIDEE':
       case 'VERIFIEE':
-        return 'Validation';
+        return 'Vérification agent';
+      case 'VALIDEE':
+        return 'Validation admin';
       case 'REJETEE':
         return 'Rejetée';
       default:
@@ -85,7 +87,7 @@ export class ListDemandeComponent implements OnInit {
       EN_ATTENTE: 'text-slate-700',
       EN_COURS: 'text-amber-700',
       VALIDEE: 'text-emerald-700',
-      VERIFIEE: 'text-emerald-700',
+      VERIFIEE: 'text-cyan-700',
       REJETEE: 'text-red-700',
     };
 
@@ -176,7 +178,7 @@ export class ListDemandeComponent implements OnInit {
       ];
     }
 
-    if (status === 'VALIDEE' || status === 'VERIFIEE') {
+    if (status === 'VALIDEE') {
       return [
         {
           label: 'Dépôt',
@@ -193,10 +195,56 @@ export class ListDemandeComponent implements OnInit {
           connectorClass: 'bg-emerald-600',
         },
         {
-          label: 'Validation',
+          label: 'Vérification',
           icon: 'fas fa-file-signature',
+          circleClass: 'bg-cyan-600 text-white',
+          labelClass: 'text-cyan-700',
+          connectorClass: 'bg-emerald-600',
+        },
+        {
+          label: 'Validation admin',
+          icon: 'fas fa-stamp',
           circleClass: 'bg-emerald-600 text-white',
           labelClass: 'text-emerald-700',
+          connectorClass: 'bg-emerald-600',
+        },
+        {
+          label: 'Terminée',
+          icon: 'fas fa-flag-checkered',
+          circleClass: 'bg-emerald-600 text-white',
+          labelClass: 'text-emerald-700',
+        },
+      ];
+    }
+
+    if (status === 'VERIFIEE') {
+      return [
+        {
+          label: 'Dépôt',
+          icon: 'fas fa-folder-open',
+          circleClass: 'bg-emerald-600 text-white',
+          labelClass: 'text-slate-900',
+          connectorClass: 'bg-emerald-600',
+        },
+        {
+          label: 'Instruction',
+          icon: 'fas fa-search',
+          circleClass: 'bg-emerald-600 text-white',
+          labelClass: 'text-slate-900',
+          connectorClass: 'bg-emerald-600',
+        },
+        {
+          label: 'Vérification',
+          icon: 'fas fa-file-signature',
+          circleClass: 'bg-cyan-600 text-white',
+          labelClass: 'text-cyan-700',
+          connectorClass: 'bg-gray-100',
+        },
+        {
+          label: 'Validation admin',
+          icon: 'fas fa-stamp',
+          circleClass: 'bg-gray-100 text-gray-400',
+          labelClass: 'text-gray-400',
           connectorClass: 'bg-gray-100',
         },
         {
@@ -225,8 +273,15 @@ export class ListDemandeComponent implements OnInit {
           connectorClass: 'bg-gray-100',
         },
         {
-          label: 'Validation',
+          label: 'Vérification',
           icon: 'fas fa-file-signature',
+          circleClass: 'bg-gray-100 text-gray-400',
+          labelClass: 'text-gray-400',
+          connectorClass: 'bg-gray-100',
+        },
+        {
+          label: 'Validation admin',
+          icon: 'fas fa-stamp',
           circleClass: 'bg-gray-100 text-gray-400',
           labelClass: 'text-gray-400',
           connectorClass: 'bg-gray-100',
@@ -256,8 +311,15 @@ export class ListDemandeComponent implements OnInit {
         connectorClass: 'bg-gray-100',
       },
       {
-        label: 'Validation',
+        label: 'Vérification',
         icon: 'fas fa-file-signature',
+        circleClass: 'bg-gray-100 text-gray-400',
+        labelClass: 'text-gray-400',
+        connectorClass: 'bg-gray-100',
+      },
+      {
+        label: 'Validation admin',
+        icon: 'fas fa-stamp',
         circleClass: 'bg-gray-100 text-gray-400',
         labelClass: 'text-gray-400',
         connectorClass: 'bg-gray-100',
@@ -321,13 +383,50 @@ export class ListDemandeComponent implements OnInit {
       .downloadDocument(this.selectedDemande.id, document.id)
       .pipe(finalize(() => (this.downloadingDocumentId = null)))
       .subscribe({
-        next: (response) => {
+        next: (response: HttpResponse<Blob>) => {
           this.saveBlob(response, document.nomOriginal);
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.errorMessage = this.extractError(error);
         },
       });
+  }
+
+  protected openDocument(document: DemandePieceJointe): void {
+    if (!this.selectedDemande) {
+      return;
+    }
+
+    this.downloadingDocumentId = document.id;
+    this.errorMessage = null;
+
+    this.demandesApi
+      .downloadDocument(this.selectedDemande.id, document.id)
+      .pipe(finalize(() => (this.downloadingDocumentId = null)))
+      .subscribe({
+        next: (response: HttpResponse<Blob>) => {
+          this.openBlob(response, document.nomOriginal);
+        },
+        error: (error: unknown) => {
+          this.errorMessage = this.extractError(error);
+        },
+      });
+  }
+
+  protected formatFileSize(size?: number): string {
+    if (!size) {
+      return 'Taille inconnue';
+    }
+
+    if (size < 1024) {
+      return `${size} o`;
+    }
+
+    if (size < 1024 * 1024) {
+      return `${(size / 1024).toFixed(1)} Ko`;
+    }
+
+    return `${(size / (1024 * 1024)).toFixed(1)} Mo`;
   }
 
   private loadDemandes(): void {
@@ -338,7 +437,7 @@ export class ListDemandeComponent implements OnInit {
       .listDemandes()
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: (demandes) => {
+        next: (demandes: DemandeResponse[]) => {
           this.demandes = demandes;
           this.hydrateDemandesWithProgrammeId(demandes);
 
@@ -346,7 +445,7 @@ export class ListDemandeComponent implements OnInit {
             this.loadSelectedDemande(demandes[0].id);
           }
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.errorMessage = this.extractError(error);
         },
       });
@@ -354,9 +453,9 @@ export class ListDemandeComponent implements OnInit {
 
   private loadProgrammes(): void {
     this.programmeService.getPrograms().subscribe({
-      next: (programmes) => {
+      next: (programmes: Programme[]) => {
         this.programmeCategories = new Map(
-          programmes.map((programme) => [Number(programme.id), programme.categorieNom]),
+          programmes.map((programme: Programme) => [Number(programme.id), programme.categorieNom]),
         );
       },
       error: () => {
@@ -373,13 +472,13 @@ export class ListDemandeComponent implements OnInit {
       .getDemande(id)
       .pipe(finalize(() => (this.selectedLoading = false)))
       .subscribe({
-        next: (demande) => {
+        next: (demande: DemandeResponse) => {
           this.selectedDemande = demande;
           this.selectedDocuments = demande.piecesJointes;
           this.demandes = this.demandes.map((item) => (item.id === demande.id ? { ...item, ...demande } : item));
           this.loadDocuments(id);
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.errorMessage = this.extractError(error);
         },
       });
@@ -387,7 +486,7 @@ export class ListDemandeComponent implements OnInit {
 
   private loadDocuments(id: number): void {
     this.demandesApi.listDocuments(id).subscribe({
-      next: (documents) => {
+      next: (documents: DemandePieceJointe[]) => {
         this.selectedDocuments = documents;
       },
       error: () => {
@@ -444,6 +543,26 @@ export class ListDemandeComponent implements OnInit {
     link.click();
 
     URL.revokeObjectURL(objectUrl);
+  }
+
+  private openBlob(response: HttpResponse<Blob>, fallbackFileName: string): void {
+    const blob = response.body;
+
+    if (!blob) {
+      this.errorMessage = 'Le document à ouvrir est vide.';
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = objectUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.ariaLabel = `Ouvrir ${fallbackFileName}`;
+    link.click();
+
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
   }
 
   private extractError(error: unknown): string {

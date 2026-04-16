@@ -22,6 +22,9 @@ export interface DemandePieceJointe {
   nomOriginal: string;
   valide: boolean;
   downloadUrl: string;
+  mimeType?: string;
+  size?: number;
+  storageKey?: string;
 }
 
 export interface DemandeProgrammeSummary {
@@ -112,7 +115,7 @@ const STATUS_LABELS: Record<string, string> = {
   EN_ATTENTE: 'En attente',
   EN_COURS: 'En cours',
   VALIDEE: 'Validée',
-  VERIFIEE: 'Validée',
+  VERIFIEE: 'Vérifiée',
   REJETEE: 'Rejetée',
 };
 
@@ -120,7 +123,7 @@ const STATUS_BADGES: Record<string, string> = {
   EN_ATTENTE: 'bg-amber-100 text-amber-800',
   EN_COURS: 'bg-sky-100 text-sky-800',
   VALIDEE: 'bg-emerald-100 text-emerald-800',
-  VERIFIEE: 'bg-emerald-100 text-emerald-800',
+  VERIFIEE: 'bg-cyan-100 text-cyan-800',
   REJETEE: 'bg-slate-200 text-slate-700',
 };
 

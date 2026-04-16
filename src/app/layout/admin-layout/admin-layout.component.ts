@@ -1,23 +1,40 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, computed, inject, signal } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
-  imports: [CommonModule, RouterLink, RouterOutlet],
+  standalone: true,
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.css',
 })
 export class AdminLayoutComponent {
-  protected readonly auth = inject(AuthService);
-  protected readonly profileMenuOpen = signal(false);
-  protected readonly currentUser = computed(() => this.auth.user());
-  protected readonly currentUserName = computed(() => {
+  readonly auth = inject(AuthService);
+  readonly profileMenuOpen = signal(false);
+  readonly currentUser = computed(() => this.auth.user());
+  readonly isAdmin = computed(() => this.currentUser()?.role === 'ADMIN');
+  readonly isAgent = computed(() => this.currentUser()?.role === 'AGENT');
+  readonly currentUserName = computed(() => {
     const user = this.currentUser();
-    return user ? `${user.prenom} ${user.nom}`.trim() : 'Compte agent';
+    return user ? `${user.prenom} ${user.nom}`.trim() : 'Compte utilisateur';
   });
-  protected readonly currentUserRole = computed(() => {
+  readonly brandSubtitle = computed(() =>
+    this.isAdmin() ? 'Espace Administration' : 'Espace Agent'
+  );
+  readonly navItems = computed(() => {
+    if (this.isAdmin()) {
+      return [
+        { label: 'Demandes', link: '/admin/demandes' },
+        { label: 'Agents', link: '/admin/agents' },
+        { label: 'Programmes', link: '/admin/programmes' },
+      ];
+    }
+
+    return [{ label: 'Demandes', link: '/admin/agent/demandes' }];
+  });
+  readonly currentUserRole = computed(() => {
     const role = this.currentUser()?.role;
     if (role === 'ADMIN') {
       return 'Administrateur';
@@ -29,7 +46,7 @@ export class AdminLayoutComponent {
 
     return 'Compte';
   });
-  protected readonly currentUserInitials = computed(() => {
+  readonly currentUserInitials = computed(() => {
     const user = this.currentUser();
     if (!user) {
       return 'AG';
@@ -38,20 +55,20 @@ export class AdminLayoutComponent {
     return `${user.prenom?.charAt(0) ?? ''}${user.nom?.charAt(0) ?? ''}`.toUpperCase() || 'AG';
   });
 
-  protected toggleProfileMenu(): void {
+  toggleProfileMenu(): void {
     this.profileMenuOpen.update((value) => !value);
   }
 
-  protected closeProfileMenu(): void {
+  closeProfileMenu(): void {
     this.profileMenuOpen.set(false);
   }
 
   @HostListener('document:click')
-  protected onDocumentClick(): void {
+  onDocumentClick(): void {
     this.closeProfileMenu();
   }
 
-  protected logout(): void {
+  logout(): void {
     this.closeProfileMenu();
     this.auth.logout();
   }

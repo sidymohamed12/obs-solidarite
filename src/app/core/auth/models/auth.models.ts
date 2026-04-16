@@ -1,5 +1,7 @@
 export type UserRole = 'CITOYEN' | 'AGENT' | 'ADMIN';
 
+export type ContactMethod = 'email' | 'phone';
+
 export interface UserDto {
   id: number;
   username: string;
@@ -8,6 +10,7 @@ export interface UserDto {
   email: string;
   phoneNumber: string;
   role: UserRole;
+  active?: boolean;
 }
 
 export interface AuthResponse {
@@ -40,6 +43,63 @@ export interface RegisterRequest {
   nom: string;
   email: string;
   password: string;
+  phoneNumber?: string;
+}
+
+export interface RegisterInitResponse {
+  message: string;
+}
+
+export interface LoginRequest {
+  email?: string;
+  phoneNumber?: string;
+  password: string;
+}
+
+export interface PendingRegistration {
+  username: string;
+  prenom: string;
+  nom: string;
+  email: string;
+  phoneNumber?: string;
+  contactMethod: ContactMethod;
+  password: string;
+  message?: string;
+  createdAt: string;
+}
+
+export interface VerifyRegistrationRequest {
+  identifier: string;
+  code: string;
+}
+
+export interface ResetPasswordRequest {
+  identifier: string;
+}
+
+export interface ConfirmResetPasswordOtpRequest {
   phoneNumber: string;
-  codePin: string;
+  otpCode: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordRequest {
+  resetToken: string;
+  newPassword: string;
+}
+
+export interface ActionMessageResponse {
+  message: string;
+}
+
+export interface VerifiedRegistration {
+  identifier: string;
+  password: string;
+  username: string;
+  prenom: string;
+  nom: string;
+  contactMethod: ContactMethod;
+  verifiedAt: string;
+  token: string;
+  user: UserDto;
 }

@@ -10,11 +10,11 @@ import {
   DemandeResponse,
   getDemandeStatusLabel,
 } from '../../../public/pages/demandes/models/demande.model';
-import { DemandesApiService } from '../../../public/pages/demandes/services/demandes-api.service';
-import { ProgrammeService } from '../../../public/pages/programme/services/programme.service';
+import { DemandesApiService } from '../services/demandes-api.service';
+import { ProgrammeService } from '../../../public/pages/programme/pages/services/programme.service';
 
-type AgentStatusFilter = 'ALL' | 'EN_ATTENTE' | 'EN_COURS' | 'VALIDEE' | 'REJETEE';
-type AgentWorkflowAction = 'PRISE_EN_CHARGE' | 'EN_COURS' | 'VALIDEE' | 'REJETEE';
+type AgentStatusFilter = 'ALL' | 'EN_ATTENTE' | 'EN_COURS' | 'VERIFIEE' | 'VALIDEE' | 'REJETEE';
+type AgentWorkflowAction = 'PRISE_EN_CHARGE' | 'EN_COURS' | 'VERIFIEE' | 'REJETEE';
 const AGENT_WORKFLOW_STORAGE_KEY = 'taxawu_agent_workflow_state';
 
 interface AgentWorkflowChecklist {
@@ -115,8 +115,9 @@ export class AgentDemandesComponent implements OnInit {
     return [
       { label: 'En attente', value: this.countByStatus('EN_ATTENTE'), status: 'EN_ATTENTE', accent: 'text-slate-900' },
       { label: 'En cours', value: this.countByStatus('EN_COURS'), status: 'EN_COURS', accent: 'text-amber-700' },
-      { label: 'Validées', value: this.countByStatus('VALIDEE'), status: 'VALIDEE', accent: 'text-emerald-700' },
+      { label: 'Vérifiées', value: this.countByStatus('VERIFIEE'), status: 'VERIFIEE', accent: 'text-cyan-700' },
       { label: 'Rejetées', value: this.countByStatus('REJETEE'), status: 'REJETEE', accent: 'text-rose-700' },
+       { label: 'Validées', value: this.countByStatus('VALIDEE'), status: 'VALIDEE', accent: 'text-emerald-700' }
     ];
   }
 
@@ -175,8 +176,8 @@ export class AgentDemandesComponent implements OnInit {
     const badgeClasses: Record<string, string> = {
       EN_ATTENTE: 'bg-slate-100 text-slate-700',
       EN_COURS: 'bg-amber-100 text-amber-700',
-      VALIDEE: 'bg-sky-100 text-sky-700',
-      VERIFIEE: 'bg-sky-100 text-sky-700',
+      VERIFIEE: 'bg-cyan-100 text-cyan-700',
+      VALIDEE: 'bg-emerald-100 text-emerald-700',
       REJETEE: 'bg-rose-100 text-rose-700',
     };
 
@@ -226,10 +227,29 @@ export class AgentDemandesComponent implements OnInit {
     this.errorMessage = null;
 
     this.demandesApi
-      .downloadDocument(this.selectedDemande.id, document.id)
+      .downloadAgentDocument(this.selectedDemande.id, document.id)
       .pipe(finalize(() => (this.downloadingDocumentId = null)))
       .subscribe({
         next: (response) => this.saveBlob(response, document.nomOriginal),
+        error: (error) => {
+          this.errorMessage = this.extractError(error);
+        },
+      });
+  }
+
+  protected openDocument(document: DemandePieceJointe): void {
+    if (!this.selectedDemande) {
+      return;
+    }
+
+    this.downloadingDocumentId = document.id;
+    this.errorMessage = null;
+
+    this.demandesApi
+      .downloadAgentDocument(this.selectedDemande.id, document.id)
+      .pipe(finalize(() => (this.downloadingDocumentId = null)))
+      .subscribe({
+        next: (response) => this.openBlob(response, document.nomOriginal),
         error: (error) => {
           this.errorMessage = this.extractError(error);
         },
@@ -244,7 +264,7 @@ export class AgentDemandesComponent implements OnInit {
     const labels: Record<AgentWorkflowAction, string> = {
       PRISE_EN_CHARGE: 'prise en charge',
       EN_COURS: 'mise en instruction',
-      VALIDEE: 'validation',
+      VERIFIEE: 'vérification',
       REJETEE: 'rejet',
     };
 
@@ -268,11 +288,11 @@ export class AgentDemandesComponent implements OnInit {
       case 'EN_COURS':
         this.infoMessage.set('La prise en charge déclenche deja la phase d\'instruction.');
         return;
-      case 'VALIDEE':
+      case 'VERIFIEE':
         request = this.demandesApi.verifyDemande(demande.id);
         fallbackPatch = { statut: 'VERIFIEE' };
         workflow.lastDecisionAt = now;
-        workflow.lastDecisionLabel = 'Dossier validé';
+        workflow.lastDecisionLabel = 'Dossier vérifié par l\'agent';
         workflow.checklist.analyseFinalisee = true;
         break;
       case 'REJETEE':
@@ -310,8 +330,12 @@ export class AgentDemandesComponent implements OnInit {
   protected getInstructionPhaseLabel(demande: DemandeResponse): string {
     const workflow = this.ensureWorkflowState(demande);
 
+    if (this.isValidatedStatus(demande.statut)) {
+      return 'Dossier validé par l\'administration';
+    }
+
     if (this.isVerifiedStatus(demande.statut)) {
-      return 'Instruction terminée avec validation';
+      return 'Dossier vérifié par l\'agent, en attente de validation admin';
     }
 
     if (demande.statut === 'REJETEE') {
@@ -333,7 +357,7 @@ export class AgentDemandesComponent implements OnInit {
     const workflow = this.ensureWorkflowState(demande);
     const checklistValues = Object.values(workflow.checklist).filter(Boolean).length;
 
-    if (this.isVerifiedStatus(demande.statut) || demande.statut === 'REJETEE') {
+    if (this.isValidatedStatus(demande.statut) || this.isVerifiedStatus(demande.statut) || demande.statut === 'REJETEE') {
       return 100;
     }
 
@@ -385,7 +409,7 @@ export class AgentDemandesComponent implements OnInit {
     return false;
   }
 
-  protected canValidate(demande: DemandeResponse): boolean {
+  protected canVerify(demande: DemandeResponse): boolean {
     return demande.statut === 'EN_COURS';
   }
 
@@ -394,10 +418,6 @@ export class AgentDemandesComponent implements OnInit {
   }
 
   private countByStatus(status: AgentStatusFilter): number {
-    if (status === 'VALIDEE') {
-      return this.demandes.filter((demande) => this.isVerifiedStatus(demande.statut)).length;
-    }
-
     return this.demandes.filter((demande) => demande.statut === status).length;
   }
 
@@ -414,8 +434,10 @@ export class AgentDemandesComponent implements OnInit {
         ? demande.updatedAt ?? demande.createdAt ?? null
         : null,
       lastDecisionLabel:
-        this.isVerifiedStatus(demande.statut)
-          ? 'Dossier validé'
+        this.isValidatedStatus(demande.statut)
+          ? 'Dossier validé par l\'administration'
+          : this.isVerifiedStatus(demande.statut)
+            ? 'Dossier vérifié par l\'agent'
           : demande.statut === 'REJETEE'
             ? 'Dossier rejeté'
             : null,
@@ -438,15 +460,15 @@ export class AgentDemandesComponent implements OnInit {
       return true;
     }
 
-    if (this.selectedStatus === 'VALIDEE') {
-      return this.isVerifiedStatus(status);
-    }
-
     return status === this.selectedStatus;
   }
 
   private isVerifiedStatus(status: string): boolean {
-    return status === 'VALIDEE' || status === 'VERIFIEE';
+    return status === 'VERIFIEE';
+  }
+
+  private isValidatedStatus(status: string): boolean {
+    return status === 'VALIDEE';
   }
 
   private applyServerDemandeUpdate(
@@ -575,6 +597,24 @@ export class AgentDemandesComponent implements OnInit {
     link.download = fallbackFileName;
     link.click();
     URL.revokeObjectURL(objectUrl);
+  }
+
+  private openBlob(response: HttpResponse<Blob>, fallbackFileName: string): void {
+    const blob = response.body;
+    if (!blob) {
+      this.errorMessage = 'Le document à ouvrir est vide.';
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.ariaLabel = `Ouvrir ${fallbackFileName}`;
+    link.click();
+
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
   }
 
   private extractError(error: unknown): string {
