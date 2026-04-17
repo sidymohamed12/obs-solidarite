@@ -1,8 +1,18 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/guards/auth.guard';
+import { guestGuard } from './core/auth/guards/guest.guard';
 import { roleGuard } from './core/auth/guards/role.guard';
 
 export const routes: Routes = [
+  {
+    path: 'reset-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./feature/public/pages/security/pages/reset-password/reset-password.component').then(
+        (m) => m.ResetPasswordComponent,
+      ),
+    title: 'Réinitialisation',
+  },
   {
     path: 'public',
     canActivate: [authGuard],

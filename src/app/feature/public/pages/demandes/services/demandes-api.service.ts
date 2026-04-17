@@ -23,8 +23,16 @@ export class DemandesApiService {
     return this.http.get<DemandeResponse[]>(API_ENDPOINTS.demandes.agentBase);
   }
 
+  listAdminDemandes(): Observable<DemandeResponse[]> {
+    return this.http.get<DemandeResponse[]>(API_ENDPOINTS.demandes.adminBase);
+  }
+
   getDemande(id: number | string): Observable<DemandeResponse> {
     return this.http.get<DemandeResponse>(API_ENDPOINTS.demandes.byId(id));
+  }
+
+  getAdminDemande(id: number | string): Observable<DemandeResponse> {
+    return this.http.get<DemandeResponse>(API_ENDPOINTS.demandes.adminById(id));
   }
 
   takeInChargeDemande(id: number | string): Observable<DemandeResponse> {
@@ -33,6 +41,14 @@ export class DemandesApiService {
 
   verifyDemande(id: number | string): Observable<DemandeResponse> {
     return this.http.patch<DemandeResponse>(API_ENDPOINTS.demandes.verify(id), null);
+  }
+
+  validateAdminDemande(id: number | string): Observable<DemandeResponse> {
+    return this.http.patch<DemandeResponse>(API_ENDPOINTS.demandes.validate(id), null);
+  }
+
+  rejectAdminDemande(id: number | string, payload: DemandeRejectPayload): Observable<DemandeResponse> {
+    return this.http.patch<DemandeResponse>(API_ENDPOINTS.demandes.adminReject(id), payload);
   }
 
   rejectDemande(id: number | string, payload: DemandeRejectPayload): Observable<DemandeResponse> {
@@ -55,11 +71,35 @@ export class DemandesApiService {
     return this.http.get<DemandePieceJointe[]>(API_ENDPOINTS.demandes.documents(id));
   }
 
+  listAgentDocuments(id: number | string): Observable<DemandePieceJointe[]> {
+    return this.http.get<DemandePieceJointe[]>(API_ENDPOINTS.demandes.agentDocuments(id));
+  }
+
   downloadDocument(
     id: number | string,
     documentId: number | string,
   ): Observable<HttpResponse<Blob>> {
     return this.http.get(API_ENDPOINTS.demandes.downloadDocument(id, documentId), {
+      observe: 'response',
+      responseType: 'blob',
+    });
+  }
+
+  downloadAgentDocument(
+    id: number | string,
+    documentId: number | string,
+  ): Observable<HttpResponse<Blob>> {
+    return this.http.get(API_ENDPOINTS.demandes.agentDownloadDocument(id, documentId), {
+      observe: 'response',
+      responseType: 'blob',
+    });
+  }
+
+  downloadAdminDocument(
+    id: number | string,
+    documentId: number | string,
+  ): Observable<HttpResponse<Blob>> {
+    return this.http.get(API_ENDPOINTS.demandes.adminDownloadDocument(id, documentId), {
       observe: 'response',
       responseType: 'blob',
     });

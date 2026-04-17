@@ -25,7 +25,7 @@
     </div>
   }
 
-  <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+  <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
     <button
       *ngFor="let kpi of kpis"
       type="button"
@@ -67,6 +67,7 @@
           <option value="ALL">Tous les statuts</option>
           <option value="EN_ATTENTE">En attente</option>
           <option value="EN_COURS">En cours</option>
+          <option value="VERIFIEE">Vérifiée</option>
           <option value="VALIDEE">Validée</option>
           <option value="REJETEE">Rejetée</option>
         </select>
@@ -215,22 +216,36 @@
 
           @if (selectedDocuments.length > 0) {
             <div class="mt-4 space-y-3">
-              <button
-                *ngFor="let document of selectedDocuments"
-                type="button"
-                (click)="downloadDocument(document)"
-                [disabled]="downloadingDocumentId === document.id"
-                class="flex w-full items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-left transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <div class="flex items-center gap-3 min-w-0">
-                  <i class="fa-solid text-xl" [ngClass]="getFileIcon(document)"></i>
-                  <div class="min-w-0">
+              <div *ngFor="let document of selectedDocuments" class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                <div class="flex items-center gap-4 p-4">
+                  <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                    <i class="fa-solid text-xl" [ngClass]="getFileIcon(document)"></i>
+                  </div>
+                  <div class="min-w-0 flex-1">
                     <p class="truncate font-semibold text-slate-900">{{ document.nomOriginal }}</p>
                     <p class="text-xs text-slate-500">{{ getFileType(document) }}</p>
                   </div>
                 </div>
-                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-300"></i>
-              </button>
+
+                <div class="flex flex-wrap gap-2 border-t border-slate-100 bg-slate-50 px-4 py-3">
+                  <button
+                    type="button"
+                    (click)="openDocument(document)"
+                    [disabled]="downloadingDocumentId === document.id"
+                    class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Ouvrir
+                  </button>
+                  <button
+                    type="button"
+                    (click)="downloadDocument(document)"
+                    [disabled]="downloadingDocumentId === document.id"
+                    class="rounded-xl border border-emerald-200 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {{ downloadingDocumentId === document.id ? 'Traitement...' : 'Télécharger' }}
+                  </button>
+                </div>
+              </div>
             </div>
           }
         </div>
@@ -323,11 +338,11 @@
             <div class="grid gap-3 sm:grid-cols-2">
               <button
                 type="button"
-                (click)="executeWorkflowAction('VALIDEE')"
-                [disabled]="actionLoading || !canValidate(currentDemande)"
+                (click)="executeWorkflowAction('VERIFIEE')"
+                [disabled]="actionLoading || !canVerify(currentDemande)"
                 class="rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Valider
+                Vérifier
               </button>
               <button
                 type="button"

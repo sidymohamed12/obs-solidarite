@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Programme } from '../../../../models/programme.model';
-import { ProgrammeService } from '../../services/programme.service';
+import { ProgrammeService } from '../services/programme.service';
 
 type ProgrammePageItem = number | 'ellipsis';
 
@@ -34,11 +34,11 @@ export class ProgrammeComponent implements OnInit {
       .getPrograms()
       .pipe(finalize(() => (this.isProgramsLoading = false)))
       .subscribe({
-        next: (programmes) => {
+        next: (programmes: Programme[]) => {
           this.programmes = programmes;
           this.currentPage = 1;
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.errorMessage = 'Impossible de charger les programmes pour le moment.';
           console.error(error);
         },
@@ -47,10 +47,10 @@ export class ProgrammeComponent implements OnInit {
 
   loadCategories(): void {
     this.programmeService.getCategories().subscribe({
-      next: (categories) => {
+      next: (categories: string[]) => {
         this.categories = categories;
       },
-      error: (error) => {
+      error: (error: unknown) => {
         console.error(error);
       },
     });

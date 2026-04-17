@@ -1,0 +1,130 @@
+<!-- Container principal -->
+<div class="min-h-screen w-full lg:h-screen lg:p-4 xl:p-6 2xl:p-8">
+  <div class="h-full w-full mx-auto bg-white rounded-3xl flex flex-col lg:flex-row lg:shadow-2xl overflow-hidden">
+    <!-- Section gauche - Branding -->
+    <div class="hidden lg:flex lg:w-1/2 xl:w-2/5 relative overflow-hidden bg-[#047857]">
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="w-100 h-100 xl:w-125 xl:h-125 border-2 border-white/5 rounded-full animate-[ping_10s_linear_infinite]"></div>
+        <div class="absolute w-150 h-150 xl:w-175 xl:h-175 border-2 border-white/5 rounded-full"></div>
+        <div class="absolute w-200 h-200 xl:w-225 xl:h-225 border-2 border-white/5 rounded-full"></div>
+      </div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 bg-emerald-400/20 rounded-full blur-[120px]"></div>
+
+      <div class="relative z-10 flex flex-col items-center justify-center w-full p-10 xl:p-12 text-center text-white">
+        <div class="animate-fadeInUp">
+          <div class="relative mb-10 xl:mb-12 inline-block group">
+            <div class="absolute -inset-8 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700"></div>
+            <div class="relative w-36 h-36 xl:w-44 xl:h-44 bg-white p-8 xl:p-10 rounded-4xl xl:rounded-[3rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] flex items-center justify-center">
+              <img src="logo.png" alt="Logo Taxawu" class="w-full h-full object-contain" />
+            </div>
+          </div>
+          <div class="space-y-3 xl:space-y-4">
+            <h1 class="text-5xl xl:text-6xl font-black tracking-tighter uppercase">Taxawu</h1>
+            <div class="flex items-center justify-center gap-4">
+              <div class="h-px w-10 xl:w-12 bg-emerald-300/50"></div>
+              <p class="text-lg xl:text-xl font-light tracking-[0.2em] uppercase text-emerald-100">
+                Vérification du compte
+              </p>
+              <div class="h-px w-10 xl:w-12 bg-emerald-300/50"></div>
+            </div>
+          </div>
+
+          <div class="mt-10 xl:mt-12 space-y-3">
+            <div class="flex items-center gap-3 text-emerald-100 text-sm xl:text-base">
+              <svg class="w-5 h-5 text-emerald-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Saisie du code de validation
+            </div>
+            <div class="flex items-center gap-3 text-emerald-100 text-sm xl:text-base">
+              <svg class="w-5 h-5 text-emerald-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Activation du compte citoyen
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute bottom-8 xl:bottom-10 left-0 right-0 px-10 xl:px-12">
+          <div class="max-w-md mx-auto py-4 border-t border-white/10">
+            <p class="text-emerald-50/60 text-xs font-medium uppercase tracking-[0.3em]">République du Sénégal</p>
+            <p class="text-[10px] text-emerald-200/40 mt-1">Ministère de la Famille et des Solidarités</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="absolute top-8 xl:top-10 left-8 xl:left-10 w-16 h-16 xl:w-20 xl:h-20 border-t-2 border-l-2 border-white/10 rounded-tl-3xl"></div>
+      <div class="absolute bottom-8 xl:bottom-10 right-8 xl:right-10 w-16 h-16 xl:w-20 xl:h-20 border-b-2 border-r-2 border-white/10 rounded-br-3xl"></div>
+    </div>
+
+    <!-- Section droite -->
+    <div class="flex-1 flex items-center justify-center px-4 py-8 sm:px-6 sm:py-10 lg:px-6 lg:py-8 xl:px-10 overflow-y-auto">
+      <div class="w-full max-w-sm sm:max-w-md xl:max-w-lg">
+        <div class="block lg:hidden mb-6 sm:mb-8 text-center animate-fadeInUp">
+          <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-2xl mb-3 shadow-lg">
+            <img src="logo.png" alt="Logo Taxawu" class="w-10 h-10 sm:w-12 sm:h-12" />
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Vérification du compte</h1>
+          <p class="text-sm sm:text-base text-gray-600 mt-1.5">Ministère de la Famille & Action Sociale</p>
+        </div>
+
+        <div class="mb-5 sm:mb-6 xl:mb-8 animate-fadeInUp delay-100 text-center">
+          <h2 class="text-2xl sm:text-3xl xl:text-4xl font-bold text-gray-900 mb-1.5">Validez votre compte</h2>
+          <p class="text-sm sm:text-base text-gray-600">{{ contactMessage }}</p>
+        </div>
+
+        <div
+          *ngIf="auth.error()"
+          class="mb-4 sm:mb-5 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 sm:p-4 text-xs sm:text-sm animate-fadeInUp"
+        >
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>{{ auth.error() }}</span>
+        </div>
+
+        <form [formGroup]="verifyForm" (ngSubmit)="onVerify()" class="space-y-3 sm:space-y-4 animate-fadeInUp delay-200">
+          <div>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5">Code de validation</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                <i class="fa-solid fa-shield-halved text-gray-400 text-sm sm:text-base"></i>
+              </div>
+              <input
+                type="text"
+                formControlName="code"
+                placeholder="0000"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                (input)="sanitizeCode($event)"
+                class="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 outline-none transition-all"
+                [class.border-red-400]="fieldError('code')"
+              />
+            </div>
+            <p *ngIf="fieldError('code')" class="mt-1 text-xs text-red-500">Code numérique requis, sur 4 à 6 chiffres</p>
+          </div>
+
+          <button
+            type="submit"
+            [disabled]="verifyForm.invalid || auth.loading()"
+            class="w-full bg-[#047857] hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-3.5 text-sm sm:text-base rounded-lg sm:rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 mt-1"
+          >
+            <svg *ngIf="auth.loading()" class="animate-spin w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            <span>{{ auth.loading() ? 'Vérification...' : 'Valider le code' }}</span>
+          </button>
+        </form>
+
+        <div class="mt-5 sm:mt-6 text-center animate-fadeInUp delay-400">
+          <p class="text-xs sm:text-sm text-gray-600">
+            Vous souhaitez revenir ?
+            <a routerLink="/auth/public/register" class="font-semibold text-[#047857] hover:text-emerald-700 transition-colors ml-1">Reprendre l'inscription</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

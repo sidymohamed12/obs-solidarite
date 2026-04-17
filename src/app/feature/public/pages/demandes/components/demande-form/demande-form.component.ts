@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -19,6 +19,15 @@ import {
 } from '../../models/demande.model';
 
 type IdentityDocumentType = 'CIN' | 'NIN';
+type SelectedFileKind = 'image' | 'pdf' | 'generic';
+
+interface SelectedFilePreview {
+  file: File;
+  previewUrl: string;
+  kind: SelectedFileKind;
+  mimeType: string;
+  size: number;
+}
 
 const LETTERS_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/;
 const DIGITS_ONLY_PATTERN = /^\d+$/;
@@ -61,7 +70,7 @@ const identityNumberValidator = (): ValidatorFn => (control: AbstractControl): V
   templateUrl: './demande-form.component.html',
   styleUrl: './demande-form.component.css',
 })
-export class DemandeFormComponent implements OnChanges {
+export class DemandeFormComponent implements OnChanges, OnDestroy {
   @Input() title = 'Nouvelle demande citoyenne';
   @Input() subtitle = 'Renseignez vos informations et joignez vos justificatifs.';
   @Input() submitLabel = 'Enregistrer';
@@ -77,6 +86,9 @@ export class DemandeFormComponent implements OnChanges {
 
   protected readonly regions = DEMANDE_REGIONS;
   protected readonly identityDocumentTypes: IdentityDocumentType[] = ['CIN', 'NIN'];
+  protected readonly maxFileCount = 5;
+  protected readonly maxFileSizeMb = 10;
+
   private readonly fb = inject(FormBuilder);
   private readonly stepOneFields = ['prenom', 'nom', 'telephone', 'identityDocumentType', 'numeroCinNin', 'region', 'commune'] as const;
   private readonly stepTwoFields = ['programmeId', 'motif'] as const;
@@ -84,7 +96,7 @@ export class DemandeFormComponent implements OnChanges {
   protected readonly demandeForm = this.fb.group({
     prenom: ['', [Validators.required, Validators.minLength(2), Validators.pattern(LETTERS_PATTERN)]],
     nom: ['', [Validators.required, Validators.minLength(2), Validators.pattern(LETTERS_PATTERN)]],
-    telephone: ['', [Validators.required, Validators.pattern('^\\d{9}$')]],
+    telephone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
     identityDocumentType: ['CIN' as IdentityDocumentType, Validators.required],
     numeroCinNin: ['', [Validators.required, identityNumberValidator()]],
     region: ['', Validators.required],
@@ -96,12 +108,13 @@ export class DemandeFormComponent implements OnChanges {
     ],
   });
 
-  protected selectedFiles: File[] = [];
+  protected selectedFiles: SelectedFilePreview[] = [];
   protected communes: string[] = [];
   protected currentStep = 1;
   protected readonly totalSteps = 3;
   protected fileSelectionAttempted = false;
   protected fileErrorMessage: string | null = null;
+  private replaceIndex: number | null = null;
 
   constructor() {
     this.demandeForm.controls.region.valueChanges.pipe(takeUntilDestroyed()).subscribe((region) => {
@@ -125,6 +138,10 @@ export class DemandeFormComponent implements OnChanges {
     }
   }
 
+  ngOnDestroy(): void {
+    this.revokeSelectedFileUrls();
+  }
+
   protected get motifLength(): number {
     return this.demandeForm.controls.motif.value?.length ?? 0;
   }
@@ -142,7 +159,7 @@ export class DemandeFormComponent implements OnChanges {
   }
 
   protected get canAddMoreFiles(): boolean {
-    return this.totalDocumentsCount < 5;
+    return this.totalDocumentsCount < this.maxFileCount;
   }
 
   protected get canProceedCurrentStep(): boolean {
@@ -154,7 +171,7 @@ export class DemandeFormComponent implements OnChanges {
       return this.stepTwoFields.every((fieldName) => this.demandeForm.get(fieldName)?.valid);
     }
 
-    return this.totalDocumentsCount > 0 && this.totalDocumentsCount <= 5;
+    return this.totalDocumentsCount > 0 && this.totalDocumentsCount <= this.maxFileCount;
   }
 
   protected onFilesSelected(event: Event): void {
@@ -165,20 +182,43 @@ export class DemandeFormComponent implements OnChanges {
       return;
     }
 
-    const remainingSlots = 5 - this.totalDocumentsCount;
+    const remainingSlots = this.maxFileCount - this.totalDocumentsCount;
 
     if (remainingSlots <= 0) {
-      this.fileErrorMessage = 'Vous pouvez joindre au maximum 5 fichiers.';
+      this.fileErrorMessage = `Vous pouvez joindre au maximum ${this.maxFileCount} fichiers.`;
       input.value = '';
+      this.replaceIndex = null;
       return;
     }
 
-    if (files.length > remainingSlots) {
+    const acceptedFiles = files.filter((file) => this.validateFile(file));
+
+    if (acceptedFiles.length === 0) {
+      input.value = '';
+      this.replaceIndex = null;
+      return;
+    }
+
+    const cappedFiles = acceptedFiles.slice(0, remainingSlots);
+
+    if (files.length > acceptedFiles.length) {
+      this.fileErrorMessage = 'Certains fichiers ont été ignorés car leur format ou taille est invalide.';
+    } else if (acceptedFiles.length > remainingSlots) {
       this.fileErrorMessage = `Vous pouvez ajouter encore ${remainingSlots} fichier(s) maximum.`;
-      this.selectedFiles = [...this.selectedFiles, ...files.slice(0, remainingSlots)];
     } else {
       this.fileErrorMessage = null;
-      this.selectedFiles = [...this.selectedFiles, ...files];
+    }
+
+    const previews = cappedFiles.map((file) => this.buildPreview(file));
+
+    if (this.replaceIndex !== null) {
+      const replacement = previews[0];
+      if (replacement) {
+        this.replaceSelectedFile(this.replaceIndex, replacement);
+      }
+      this.replaceIndex = null;
+    } else {
+      this.selectedFiles = [...this.selectedFiles, ...previews];
     }
 
     this.fileSelectionAttempted = false;
@@ -186,8 +226,66 @@ export class DemandeFormComponent implements OnChanges {
   }
 
   protected removeFile(index: number): void {
+    const target = this.selectedFiles[index];
+    if (target) {
+      URL.revokeObjectURL(target.previewUrl);
+    }
+
     this.selectedFiles = this.selectedFiles.filter((_, currentIndex) => currentIndex !== index);
     this.fileErrorMessage = null;
+  }
+
+  protected replaceFile(index: number, fileInput: HTMLInputElement): void {
+    this.replaceIndex = index;
+    fileInput.click();
+  }
+
+  protected openPreview(file: SelectedFilePreview): void {
+    const newTab = window.open(file.previewUrl, '_blank', 'noopener,noreferrer');
+    newTab?.focus();
+  }
+
+  protected downloadFile(file: SelectedFilePreview): void {
+    const link = document.createElement('a');
+    link.href = file.previewUrl;
+    link.download = file.file.name;
+    link.click();
+  }
+
+  protected previewLabel(file: SelectedFilePreview): string {
+    if (file.kind === 'image') {
+      return 'Image';
+    }
+
+    if (file.kind === 'pdf') {
+      return 'PDF';
+    }
+
+    return 'Fichier';
+  }
+
+  protected getPreviewIcon(file: SelectedFilePreview): string {
+    if (file.kind === 'image') {
+      return 'fa-image';
+    }
+
+    if (file.kind === 'pdf') {
+      return 'fa-file-pdf';
+    }
+
+    return 'fa-file-lines';
+  }
+
+  protected formatFileSize(size: number): string {
+    if (size < 1024) {
+      return `${size} o`;
+    }
+
+    if (size < 1024 * 1024) {
+      return `${(size / 1024).toFixed(1)} Ko`;
+    }
+
+    return `${(size / (1024 * 1024)).toFixed(1)} Mo`;
   }
 
   protected sanitizeLettersField(fieldName: 'prenom' | 'nom', event: Event): void {
@@ -251,11 +349,11 @@ export class DemandeFormComponent implements OnChanges {
   }
 
   protected submit(): void {
-    if (this.demandeForm.invalid || this.totalDocumentsCount === 0 || this.totalDocumentsCount > 5) {
+    if (this.demandeForm.invalid || this.totalDocumentsCount === 0 || this.totalDocumentsCount > this.maxFileCount) {
       this.demandeForm.markAllAsTouched();
       this.fileSelectionAttempted = this.totalDocumentsCount === 0;
-      if (this.totalDocumentsCount > 5) {
-        this.fileErrorMessage = 'Vous pouvez joindre au maximum 5 fichiers.';
+      if (this.totalDocumentsCount > this.maxFileCount) {
+        this.fileErrorMessage = `Vous pouvez joindre au maximum ${this.maxFileCount} fichiers.`;
       }
       return;
     }
@@ -271,7 +369,7 @@ export class DemandeFormComponent implements OnChanges {
       commune: value.commune ?? '',
       programmeId: Number(value.programmeId),
       motif: value.motif ?? '',
-      piecesJointes: [...this.selectedFiles],
+      piecesJointes: this.selectedFiles.map((item) => item.file),
     });
   }
 
@@ -322,5 +420,61 @@ export class DemandeFormComponent implements OnChanges {
   private detectIdentityDocumentType(numeroCinNin: string): IdentityDocumentType {
     const digits = String(numeroCinNin ?? '').replace(/\D/g, '');
     return digits.length > 13 ? 'NIN' : 'CIN';
+  }
+
+  private buildPreview(file: File): SelectedFilePreview {
+    return {
+      file,
+      previewUrl: URL.createObjectURL(file),
+      kind: this.resolveFileKind(file),
+      mimeType: file.type || 'application/octet-stream',
+      size: file.size,
+    };
+  }
+
+  private replaceSelectedFile(index: number, replacement: SelectedFilePreview): void {
+    const target = this.selectedFiles[index];
+
+    if (target) {
+      URL.revokeObjectURL(target.previewUrl);
+    }
+
+    this.selectedFiles = this.selectedFiles.map((item, currentIndex) => (currentIndex === index ? replacement : item));
+    this.fileErrorMessage = null;
+  }
+
+  private resolveFileKind(file: File): SelectedFileKind {
+    const mimeType = file.type.toLowerCase();
+    const extension = file.name.split('.').pop()?.toLowerCase();
+
+    if (mimeType.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension ?? '')) {
+      return 'image';
+    }
+
+    if (mimeType === 'application/pdf' || extension === 'pdf') {
+      return 'pdf';
+    }
+
+    return 'generic';
+  }
+
+  private validateFile(file: File): boolean {
+    if (!file.name.trim()) {
+      this.fileErrorMessage = 'Un fichier sans nom n’est pas supporté.';
+      return false;
+    }
+
+    const maxBytes = this.maxFileSizeMb * 1024 * 1024;
+    if (file.size > maxBytes) {
+      this.fileErrorMessage = `Le fichier ${file.name} dépasse ${this.maxFileSizeMb} Mo.`;
+      return false;
+    }
+
+    return true;
+  }
+
+  private revokeSelectedFileUrls(): void {
+    this.selectedFiles.forEach((file) => URL.revokeObjectURL(file.previewUrl));
+    this.selectedFiles = [];
   }
 }

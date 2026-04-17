@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Programme } from '../../../../models/programme.model';
-import { ProgrammeService } from '../../services/programme.service';
+import { ProgrammeService } from '../services/programme.service';
 
 @Component({
   selector: 'app-detail-programme',
@@ -13,7 +13,7 @@ import { ProgrammeService } from '../../services/programme.service';
 })
 export class DetailProgrammeComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly programmeService = inject(ProgrammeService);
+  private readonly programmeService: ProgrammeService = inject(ProgrammeService);
 
   protected programme: Programme | null = null;
   protected loading = false;
@@ -51,7 +51,7 @@ export class DetailProgrammeComponent implements OnInit {
       .getProgramById(id)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: (programme) => {
+        next: (programme: Programme | undefined) => {
           if (!programme) {
             this.errorMessage = 'Programme introuvable.';
             return;
@@ -59,7 +59,7 @@ export class DetailProgrammeComponent implements OnInit {
 
           this.programme = programme;
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.errorMessage = this.extractError(error);
         },
       });

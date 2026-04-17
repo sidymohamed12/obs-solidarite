@@ -15,6 +15,19 @@ export interface ProgrammeCategory {
   nom: string;
   code: string;
   description: string;
+}
+
+export interface ProgrammeUpsertPayload {
+  titre: string;
+  description: string;
+  image: string;
+  categorieId: number;
+  active: boolean;
+}
+
+export interface ProgrammeCategoryUpsertPayload {
+  nom: string;
+  description: string;
   active: boolean;
 }
 

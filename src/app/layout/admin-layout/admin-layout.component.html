@@ -1,17 +1,29 @@
 <div class="min-h-screen bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.16),transparent_28%),linear-gradient(180deg,#f8fafc_0%,#eef2f7_100%)] text-slate-900">
 	<nav class="sticky top-0 z-50 w-full border-b border-slate-100 bg-white/90 backdrop-blur-md">
-		<div class="max-w-640 mx-auto px-4 sm:px-8 lg:px-16 flex justify-between items-center h-20">
-			<a routerLink="/admin/demandes" class="flex items-center gap-3">
+		<div class="max-w-640 mx-auto px-4 sm:px-8 lg:px-16 flex justify-between items-center h-20 gap-4">
+			<a [routerLink]="isAdmin() ? '/admin/demandes' : '/admin/agent/demandes'" class="flex items-center gap-3">
 				<div class="w-14 h-14 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100">
 					<img class="w-full h-full object-cover" src="logo.png" alt="Logo" />
 				</div>
 				<div class="hidden sm:block">
 					<h1 class="font-bold text-sm flex flex-col text-primary uppercase tracking-wider leading-tight">
 						TAXAWU
-						<span class="text-slate-600 text-[8px]">Espace Agent <br />Observatoire des Solidarités</span>
+						<span class="text-slate-600 text-[8px]">{{ brandSubtitle() }} <br />Observatoire des Solidarités</span>
 					</h1>
 				</div>
 			</a>
+
+			<div class="hidden md:flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-2 py-1">
+				<a
+					*ngFor="let item of navItems()"
+					[routerLink]="item.link"
+					routerLinkActive="bg-white text-emerald-700 shadow-sm"
+					[routerLinkActiveOptions]="{ exact: true }"
+					class="rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500 transition hover:text-emerald-700"
+				>
+					{{ item.label }}
+				</a>
+			</div>
 
 			<div class="relative" (click)="$event.stopPropagation()">
 				<button
