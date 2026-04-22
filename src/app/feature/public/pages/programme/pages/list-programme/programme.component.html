@@ -61,27 +61,55 @@
         Nos Programmes <span class="text-emerald-500">Impact</span>
       </h2>
 
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex w-full items-center gap-3 md:w-auto md:max-w-[min(60vw,56rem)]">
         <button
           type="button"
-          (click)="selectCategory('all')"
-          [class]="isSelectedCategory('all')
-            ? 'filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-emerald-500 text-white shadow-lg shadow-emerald-200 hover:scale-105'
-            : 'filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200'"
+          (click)="scrollCategories('left')"
+          [disabled]="!canScrollCategoriesLeft"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-300 hover:border-emerald-300 hover:text-emerald-600 disabled:pointer-events-none disabled:opacity-35"
+          aria-label="Défiler les catégories vers la gauche"
         >
-          Tous
+          <i class="fa-solid fa-chevron-left text-sm"></i>
         </button>
-        @for (category of categories; track category) {
-          <button
-            type="button"
-            (click)="selectCategory(category)"
-            [class]="isSelectedCategory(category)
-              ? 'filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-emerald-500 text-white shadow-lg shadow-emerald-200 hover:scale-105'
-              : 'filter-btn px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200'"
-          >
-            {{ category }}
-          </button>
-        }
+
+        <div
+          #categoryScroller
+          (scroll)="onCategoryScroll()"
+          class="programme-category-scroll w-full overflow-x-auto overscroll-x-contain"
+        >
+          <div class="flex w-max min-w-full items-center gap-2 pr-1 md:justify-end">
+            <button
+              type="button"
+              (click)="selectCategory('all')"
+              [class]="isSelectedCategory('all')
+                ? 'filter-btn shrink-0 whitespace-nowrap px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-emerald-500 text-white shadow-lg shadow-emerald-200 hover:scale-105'
+                : 'filter-btn shrink-0 whitespace-nowrap px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200'"
+            >
+              Tous
+            </button>
+            @for (category of categories; track category) {
+              <button
+                type="button"
+                (click)="selectCategory(category)"
+                [class]="isSelectedCategory(category)
+                  ? 'filter-btn shrink-0 whitespace-nowrap px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-emerald-500 text-white shadow-lg shadow-emerald-200 hover:scale-105 cursor-pointer'
+                  : 'filter-btn shrink-0 whitespace-nowrap px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-300 bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 border border-transparent hover:border-emerald-200 cursor-pointer'"
+              >
+                {{ category }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="scrollCategories('right')"
+          [disabled]="!canScrollCategoriesRight"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-all duration-300 hover:border-emerald-300 hover:text-emerald-600 disabled:pointer-events-none disabled:opacity-35"
+          aria-label="Défiler les catégories vers la droite"
+        >
+          <i class="fa-solid fa-chevron-right text-sm"></i>
+        </button>
       </div>
     </div>
   </div>

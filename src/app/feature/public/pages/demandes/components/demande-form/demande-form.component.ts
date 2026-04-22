@@ -18,7 +18,7 @@ import {
   DemandeProgrammeOption,
 } from '../../models/demande.model';
 
-type IdentityDocumentType = 'CIN' | 'NIN';
+type IdentityDocumentType = 'CIN' | 'PASSPORT';
 type SelectedFileKind = 'image' | 'pdf' | 'generic';
 
 interface SelectedFilePreview {
@@ -31,6 +31,8 @@ interface SelectedFilePreview {
 
 const LETTERS_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/;
 const DIGITS_ONLY_PATTERN = /^\d+$/;
+const PASSPORT_PATTERN = /^[A-Za-z0-9]+$/;
+const PASSPORT_PREFIX_PATTERN = /^[A-Za-z]/;
 
 const containsLetterValidator = (): ValidatorFn => (control: AbstractControl): ValidationErrors | null => {
   const value = String(control.value ?? '').trim();
@@ -50,17 +52,25 @@ const identityNumberValidator = (): ValidatorFn => (control: AbstractControl): V
     return null;
   }
 
-  if (!DIGITS_ONLY_PATTERN.test(rawValue)) {
-    return { digitsOnly: true };
-  }
-
   const selectedType = (parent?.get('identityDocumentType')?.value as IdentityDocumentType | null) ?? 'CIN';
 
   if (selectedType === 'CIN') {
+    if (!DIGITS_ONLY_PATTERN.test(rawValue)) {
+      return { digitsOnly: true };
+    }
+
     return rawValue.length === 13 ? null : { invalidCinLength: true };
   }
 
-  return rawValue.length === 18 ? null : { invalidNinLength: true };
+  if (!PASSPORT_PATTERN.test(rawValue)) {
+    return { invalidPassportFormat: true };
+  }
+
+  if (!PASSPORT_PREFIX_PATTERN.test(rawValue)) {
+    return { invalidPassportPrefix: true };
+  }
+
+  return rawValue.length >= 6 && rawValue.length <= 18 ? null : { invalidPassportLength: true };
 };
 
 @Component({
@@ -85,7 +95,7 @@ export class DemandeFormComponent implements OnChanges, OnDestroy {
   @Output() downloadDocument = new EventEmitter<DemandePieceJointe>();
 
   protected readonly regions = DEMANDE_REGIONS;
-  protected readonly identityDocumentTypes: IdentityDocumentType[] = ['CIN', 'NIN'];
+  protected readonly identityDocumentTypes: IdentityDocumentType[] = ['CIN', 'PASSPORT'];
   protected readonly maxFileCount = 5;
   protected readonly maxFileSizeMb = 10;
 
@@ -123,7 +133,13 @@ export class DemandeFormComponent implements OnChanges, OnDestroy {
 
     this.demandeForm.controls.identityDocumentType.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(() => {
+      .subscribe((type) => {
+        const normalizedValue = this.normalizeIdentityNumber(
+          this.demandeForm.controls.numeroCinNin.value ?? '',
+          (type as IdentityDocumentType | null) ?? 'CIN',
+        );
+
+        this.demandeForm.controls.numeroCinNin.setValue(normalizedValue, { emitEvent: false });
         this.demandeForm.controls.numeroCinNin.updateValueAndValidity();
       });
   }
@@ -314,6 +330,19 @@ export class DemandeFormComponent implements OnChanges, OnDestroy {
     this.demandeForm.controls[fieldName].updateValueAndValidity();
   }
 
+  protected sanitizeIdentityNumberField(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const sanitizedValue = this.normalizeIdentityNumber(input.value, this.selectedIdentityDocumentType);
+
+    if (sanitizedValue !== input.value) {
+      input.value = sanitizedValue;
+    }
+
+    this.demandeForm.controls.numeroCinNin.setValue(sanitizedValue, { emitEvent: false });
+    this.demandeForm.controls.numeroCinNin.markAsTouched();
+    this.demandeForm.controls.numeroCinNin.updateValueAndValidity();
+  }
+
   protected handleMotifInput(event: Event): void {
     const input = event.target as HTMLTextAreaElement;
     const sanitizedValue = input.value.slice(0, 1000);
@@ -388,7 +417,83 @@ export class DemandeFormComponent implements OnChanges, OnDestroy {
   }
 
   protected getIdentityNumberPlaceholder(): string {
-    return this.selectedIdentityDocumentType === 'CIN' ? 'Ex: 1234567890123' : 'Ex: 123456789012345678';
+    return this.selectedIdentityDocumentType === 'CIN' ? 'Ex: 1234567890123' : 'Ex: A1234567';
+  }
+
+  protected getNameFieldError(fieldName: 'prenom' | 'nom'): string {
+    const errors = this.demandeForm.controls[fieldName].errors;
+
+    if (errors?.['required']) {
+      return fieldName === 'prenom' ? 'Le prénom est requis.' : 'Le nom est requis.';
+    }
+
+    if (errors?.['minlength']) {
+      return fieldName === 'prenom'
+        ? 'Le prénom doit contenir au moins 2 caractères.'
+        : 'Le nom doit contenir au moins 2 caractères.';
+    }
+
+    return fieldName === 'prenom'
+      ? 'Le prénom doit contenir uniquement des lettres.'
+      : 'Le nom doit contenir uniquement des lettres.';
+  }
+
+  protected getTelephoneError(): string {
+    const errors = this.demandeForm.controls.telephone.errors;
+
+    if (errors?.['required']) {
+      return 'Le téléphone est requis.';
+    }
+
+    return 'Le téléphone doit contenir exactement 9 chiffres.';
+  }
+
+  protected getIdentityNumberError(): string {
+    const errors = this.demandeForm.controls.numeroCinNin.errors;
+
+    if (errors?.['required']) {
+      return 'Le numéro de pièce est requis.';
+    }
+
+    if (errors?.['digitsOnly']) {
+      return 'Le numéro CIN doit contenir uniquement des chiffres.';
+    }
+
+    if (errors?.['invalidCinLength']) {
+      return 'Le numéro CIN doit contenir exactement 13 chiffres.';
+    }
+
+    if (errors?.['invalidPassportFormat']) {
+      return 'Le numéro de passport doit contenir uniquement des lettres et des chiffres.';
+    }
+
+    if (errors?.['invalidPassportPrefix']) {
+      return 'Le numéro de passport doit commencer par une lettre.';
+    }
+
+    if (errors?.['invalidPassportLength']) {
+      return 'Le numéro de passport doit contenir entre 6 et 18 caractères.';
+    }
+
+    return 'Le numéro de pièce est invalide.';
+  }
+
+  protected getMotifError(): string {
+    const errors = this.demandeForm.controls.motif.errors;
+
+    if (errors?.['required']) {
+      return 'Le motif est requis.';
+    }
+
+    if (errors?.['missingLetter']) {
+      return 'Le motif doit contenir des lettres.';
+    }
+
+    if (errors?.['maxlength']) {
+      return 'Le motif ne doit pas dépasser 1000 caractères.';
+    }
+
+    return 'Minimum 20 caractères requis.';
   }
 
   private canMoveToNextStep(): boolean {
@@ -419,7 +524,17 @@ export class DemandeFormComponent implements OnChanges, OnDestroy {
 
   private detectIdentityDocumentType(numeroCinNin: string): IdentityDocumentType {
     const digits = String(numeroCinNin ?? '').replace(/\D/g, '');
-    return digits.length > 13 ? 'NIN' : 'CIN';
+    return digits.length === 13 ? 'CIN' : 'PASSPORT';
+  }
+
+  private normalizeIdentityNumber(value: string, type: IdentityDocumentType): string {
+    const rawValue = String(value ?? '');
+
+    if (type === 'CIN') {
+      return rawValue.replace(/\D/g, '').slice(0, 13);
+    }
+
+    return rawValue.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 18);
   }
 
   private buildPreview(file: File): SelectedFilePreview {

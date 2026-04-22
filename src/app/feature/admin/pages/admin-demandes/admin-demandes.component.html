@@ -116,24 +116,34 @@
             </td>
             <td class="px-5 py-4">
               <div class="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  (click)="validateDemande(demande)"
-                  [disabled]="!canValidateDemande(demande) || isProcessing(demande, 'reject') || isProcessing(demande, 'validate')"
-                  class="rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] transition"
-                  [ngClass]="canValidateDemande(demande) && !isProcessing(demande, 'reject') && !isProcessing(demande, 'validate') ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'"
-                >
-                  {{ isProcessing(demande, 'validate') ? 'Validation...' : getValidateButtonLabel(demande) }}
-                </button>
-                <button
-                  type="button"
-                  (click)="rejectDemande(demande)"
-                  [disabled]="!canRejectDemande(demande) || isProcessing(demande, 'validate') || isProcessing(demande, 'reject')"
-                  class="rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] transition"
-                  [ngClass]="canRejectDemande(demande) && !isProcessing(demande, 'validate') && !isProcessing(demande, 'reject') ? 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100' : 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'"
-                >
-                  {{ isProcessing(demande, 'reject') ? 'Rejet...' : getRejectButtonLabel(demande) }}
-                </button>
+                <ng-container *ngIf="shouldShowDecisionActions(demande); else decisionStatus">
+                  <button
+                    type="button"
+                    (click)="validateDemande(demande)"
+                    [disabled]="!canValidateDemande(demande) || isProcessing(demande, 'reject') || isProcessing(demande, 'validate')"
+                    class="rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] transition"
+                    [ngClass]="canValidateDemande(demande) && !isProcessing(demande, 'reject') && !isProcessing(demande, 'validate') ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'"
+                  >
+                    {{ isProcessing(demande, 'validate') ? 'Validation...' : getValidateButtonLabel(demande) }}
+                  </button>
+                  <button
+                    type="button"
+                    (click)="rejectDemande(demande)"
+                    [disabled]="!canRejectDemande(demande) || isProcessing(demande, 'validate') || isProcessing(demande, 'reject')"
+                    class="rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] transition"
+                    [ngClass]="canRejectDemande(demande) && !isProcessing(demande, 'validate') && !isProcessing(demande, 'reject') ? 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100' : 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'"
+                  >
+                    {{ isProcessing(demande, 'reject') ? 'Rejet...' : getRejectButtonLabel(demande) }}
+                  </button>
+                </ng-container>
+                <ng-template #decisionStatus>
+                  <span
+                    class="inline-flex rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.16em]"
+                    [ngClass]="getDecisionStatusClass(demande)"
+                  >
+                    {{ getDecisionStatusLabel(demande) }}
+                  </span>
+                </ng-template>
               </div>
             </td>
           </tr>
@@ -190,7 +200,7 @@
             <p><span class="font-semibold text-slate-900">Prénom :</span> {{ demande.prenom || '—' }}</p>
             <p><span class="font-semibold text-slate-900">Nom :</span> {{ demande.nom || '—' }}</p>
             <p><span class="font-semibold text-slate-900">Téléphone :</span> {{ demande.telephone || '—' }}</p>
-            <p><span class="font-semibold text-slate-900">CIN / NIN :</span> {{ demande.numeroCinNin || '—' }}</p>
+            <p><span class="font-semibold text-slate-900">CIN / Passport :</span> {{ demande.numeroCinNin || '—' }}</p>
             <p><span class="font-semibold text-slate-900">Région :</span> {{ demande.region || '—' }}</p>
             <p><span class="font-semibold text-slate-900">Commune :</span> {{ demande.commune || '—' }}</p>
           </div>
@@ -201,7 +211,7 @@
           <div class="mt-4 space-y-3 text-sm text-slate-600">
             <p><span class="font-semibold text-slate-900">Programme :</span> {{ demande.programme?.titre || '—' }}</p>
             <p><span class="font-semibold text-slate-900">Catégorie :</span> {{ demande.programme?.categorieNom || '—' }}</p>
-            <p><span class="font-semibold text-slate-900">Agent :</span> {{ demande.traiteParNom || 'Non affecté' }}</p>
+            <p><span class="font-semibold text-slate-900">Agent :</span> {{ demande.prisEnChargeParNom || 'Non affecté' }}</p>
             <p><span class="font-semibold text-slate-900">Motif :</span></p>
             <p class="rounded-2xl bg-slate-50 px-4 py-3 leading-6">{{ demande.motif || 'Aucun motif renseigné.' }}</p>
 

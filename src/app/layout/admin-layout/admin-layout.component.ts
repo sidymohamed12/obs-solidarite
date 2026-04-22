@@ -29,6 +29,7 @@ export class AdminLayoutComponent {
         { label: 'Demandes', link: '/admin/demandes' },
         { label: 'Agents', link: '/admin/agents' },
         { label: 'Programmes', link: '/admin/programmes' },
+        { label: 'Publications', link: '/admin/publications' },
       ];
     }
 

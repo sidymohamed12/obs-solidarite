@@ -122,28 +122,40 @@ export class AdminDemandesComponent implements OnInit {
     return demande.statut === 'VERIFIEE';
   }
 
-  protected getValidateButtonLabel(demande: DemandeResponse): string {
+  protected shouldShowDecisionActions(demande: DemandeResponse): boolean {
+    return demande.statut === 'VERIFIEE';
+  }
+
+  protected getDecisionStatusLabel(demande: DemandeResponse): string {
     if (demande.statut === 'VALIDEE') {
-      return 'Déjà validé';
+      return 'Validée';
     }
 
-    if (demande.statut === 'VERIFIEE') {
-      return 'Valider';
+    if (demande.statut === 'REJETEE') {
+      return 'Rejetée';
     }
 
     return 'En attente de vérification';
   }
 
-  protected getRejectButtonLabel(demande: DemandeResponse): string {
+  protected getDecisionStatusClass(demande: DemandeResponse): string {
+    if (demande.statut === 'VALIDEE') {
+      return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+    }
+
     if (demande.statut === 'REJETEE') {
-      return 'Déjà rejeté';
+      return 'border-rose-200 bg-rose-50 text-rose-700';
     }
 
-    if (demande.statut === 'VERIFIEE') {
-      return 'Rejeter';
-    }
+    return 'border-slate-200 bg-slate-100 text-slate-400';
+  }
 
-    return 'En attente de vérification';
+  protected getValidateButtonLabel(demande: DemandeResponse): string {
+    return demande.statut === 'VERIFIEE' ? 'Valider' : 'Validée';
+  }
+
+  protected getRejectButtonLabel(demande: DemandeResponse): string {
+    return demande.statut === 'VERIFIEE' ? 'Rejeter' : 'Rejetée';
   }
 
   protected isProcessing(demande: DemandeResponse, action: 'validate' | 'reject'): boolean {

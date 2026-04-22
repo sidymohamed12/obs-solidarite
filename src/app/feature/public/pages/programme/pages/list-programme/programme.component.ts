@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Programme } from '../../../../models/programme.model';
@@ -13,6 +13,8 @@ type ProgrammePageItem = number | 'ellipsis';
   styleUrl: './programme.component.css',
 })
 export class ProgrammeComponent implements OnInit {
+  @ViewChild('categoryScroller') private categoryScroller?: ElementRef<HTMLDivElement>;
+
   programmes: Programme[] = [];
   categories: string[] = [];
   isProgramsLoading: boolean = false;
@@ -20,11 +22,17 @@ export class ProgrammeComponent implements OnInit {
   selectedCategory: string = 'all';
   readonly pageSize: number = 6;
   currentPage: number = 1;
+  canScrollCategoriesLeft: boolean = false;
+  canScrollCategoriesRight: boolean = false;
   private readonly programmeService: ProgrammeService = inject(ProgrammeService);
 
   ngOnInit(): void {
     this.loadProgrammes();
     this.loadCategories();
+  }
+
+  ngAfterViewInit(): void {
+    queueMicrotask(() => this.updateCategoryScrollState());
   }
 
   loadProgrammes(): void {
@@ -49,6 +57,7 @@ export class ProgrammeComponent implements OnInit {
     this.programmeService.getCategories().subscribe({
       next: (categories: string[]) => {
         this.categories = categories;
+        queueMicrotask(() => this.updateCategoryScrollState());
       },
       error: (error: unknown) => {
         console.error(error);
@@ -142,5 +151,42 @@ export class ProgrammeComponent implements OnInit {
 
   nextPage(): void {
     this.goToPage(this.currentPage + 1);
+  }
+
+  scrollCategories(direction: 'left' | 'right'): void {
+    const scroller = this.categoryScroller?.nativeElement;
+
+    if (!scroller) {
+      return;
+    }
+
+    const offset = Math.max(220, Math.floor(scroller.clientWidth * 0.6));
+    scroller.scrollBy({
+      left: direction === 'left' ? -offset : offset,
+      behavior: 'smooth',
+    });
+  }
+
+  onCategoryScroll(): void {
+    this.updateCategoryScrollState();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateCategoryScrollState();
+  }
+
+  private updateCategoryScrollState(): void {
+    const scroller = this.categoryScroller?.nativeElement;
+
+    if (!scroller) {
+      this.canScrollCategoriesLeft = false;
+      this.canScrollCategoriesRight = false;
+      return;
+    }
+
+    const maxScrollLeft = scroller.scrollWidth - scroller.clientWidth;
+    this.canScrollCategoriesLeft = scroller.scrollLeft > 4;
+    this.canScrollCategoriesRight = maxScrollLeft - scroller.scrollLeft > 4;
   }
 }

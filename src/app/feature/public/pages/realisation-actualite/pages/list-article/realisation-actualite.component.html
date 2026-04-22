@@ -37,10 +37,10 @@
           </p>
 
           <a
-            href="#"
+            href="/public/accueil"
             class="inline-flex items-center px-8 py-4 text-white font-bold rounded-2xl transition-all shadow-xl shadow-emerald-900/40 bg-emerald-600 hover:bg-emerald-500"
           >
-            voir plus
+            Retour à l'accueil
             <i class="fas ml-3 fa-arrow-right"></i>
           </a>
         </div>
@@ -93,16 +93,15 @@
       </p>
     </div>
 
-    <!-- Filter Buttons -->
-    <!-- <div
-      class="flex p-1.5 bg-slate-200/50 backdrop-blur-md rounded-4xl border border-slate-200 w-fit"
+    <div
+      class="flex flex-wrap gap-2 p-1.5 bg-slate-200/50 backdrop-blur-md rounded-4xl border border-slate-200 w-fit"
     >
       <button
         (click)="setFilter('all')"
         class="px-8 py-3 rounded-3xl font-bold transition-all active:scale-95"
         [ngClass]="{
-          'bg-white shadow-lg shadow-slate-200 text-slate-900': activeFilter === 'all',
-          'text-slate-500 hover:text-slate-900': activeFilter !== 'all',
+          'bg-white shadow-lg shadow-slate-200 text-slate-900': activeFilter() === 'all',
+          'text-slate-500 hover:text-slate-900': activeFilter() !== 'all',
         }"
       >
         Tout voir
@@ -111,8 +110,8 @@
         (click)="setFilter('actualite')"
         class="px-8 py-3 rounded-3xl font-bold transition-all"
         [ngClass]="{
-          'bg-white shadow-lg shadow-slate-200 text-slate-900': activeFilter === 'actualite',
-          'text-slate-500 hover:text-slate-900': activeFilter !== 'actualite',
+          'bg-white shadow-lg shadow-slate-200 text-slate-900': activeFilter() === 'actualite',
+          'text-slate-500 hover:text-slate-900': activeFilter() !== 'actualite',
         }"
       >
         Actualités
@@ -121,21 +120,28 @@
         (click)="setFilter('realisation')"
         class="px-8 py-3 rounded-3xl font-bold transition-all"
         [ngClass]="{
-          'bg-white shadow-lg shadow-slate-200 text-slate-900': activeFilter === 'realisation',
-          'text-slate-500 hover:text-slate-900': activeFilter !== 'realisation',
+          'bg-white shadow-lg shadow-slate-200 text-slate-900': activeFilter() === 'realisation',
+          'text-slate-500 hover:text-slate-900': activeFilter() !== 'realisation',
         }"
       >
         Réalisations
       </button>
-    </div> -->
+    </div>
   </div>
 </header>
 
 <!-- Articles Grid -->
 <main class="w-full mx-auto px-6 lg:px-20 pb-32">
+  <div *ngIf="isArticleLoading" class="mb-8 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center text-slate-500">
+    Chargement des publications...
+  </div>
+
+  <div *ngIf="!isArticleLoading && filteredArticles().length === 0" class="mb-8 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-500">
+    Aucune publication disponible pour ce filtre.
+  </div>
+
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-    @for (article of articles; track $index) {
-      <!-- Regular News Article -->
+    @for (article of filteredArticles(); track article.id) {
       <article
         (click)="onArticleClick(article)"
         class="group p-6 rounded-[2.5rem] bg-slate-100 transition-all duration-500 cursor-pointer flex flex-col h-full"
@@ -149,7 +155,7 @@
           <span
             class="absolute top-4 left-4 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full text-[10px] font-black text-emerald-700 uppercase"
           >
-            {{ article.type }}
+            {{ article.typeLabel }}
           </span>
         </div>
 
@@ -184,39 +190,10 @@
       </article>
     }
   </div>
-  <div class="mt-16 flex items-center justify-center gap-2">
-    <button
-      class="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-600 hover:bg-emerald-600 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      <i class="fas fa-chevron-left text-xs"></i>
-    </button>
-
-    <div class="flex items-center gap-2">
-      <button
-        class="w-12 h-12 flex items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-200"
-      >
-        1
-      </button>
-
-      <button
-        class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-slate-100 text-slate-600 font-bold hover:bg-slate-50 transition-colors"
-      >
-        2
-      </button>
-
-      <span class="px-2 text-slate-400 font-bold">...</span>
-
-      <button
-        class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-slate-100 text-slate-600 font-bold hover:bg-slate-50 transition-colors"
-      >
-        10
-      </button>
-    </div>
-
-    <button
-      class="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-600 hover:bg-emerald-600 hover:text-white transition-all duration-300"
-    >
-      <i class="fas fa-chevron-right text-xs"></i>
-    </button>
+  <div class="mt-16 flex items-center justify-center">
+    <a href="/public/accueil" class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 py-3 font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">
+      Retour à l'accueil
+      <i class="fas fa-arrow-left text-xs"></i>
+    </a>
   </div>
 </main>

@@ -65,4 +65,11 @@ export const API_ENDPOINTS = {
     byCategory: (category: string) =>
       `${API_BASE_URL}/api/v1/web/programmes?category=${encodeURIComponent(category)}`,
   },
+  posts: {
+    base: `${API_BASE_URL}/api/v1/web/posts`,
+    byId: (id: number | string) => `${API_BASE_URL}/api/v1/web/posts/${id}`,
+    byType: (typePost: string) =>
+      `${API_BASE_URL}/api/v1/web/posts/type/${encodeURIComponent(typePost)}`,
+    image: (id: number | string) => `${API_BASE_URL}/api/v1/web/posts/${id}/image`,
+  },
 };

@@ -43,7 +43,7 @@
         </div>
 
         <div class="grid gap-2 text-sm text-slate-600 sm:grid-cols-2 lg:text-right">
-          <p><span class="font-semibold text-slate-900">Agent :</span> {{ currentDemande.traiteParNom || 'Non affecté' }}</p>
+          <p><span class="font-semibold text-slate-900">Agent :</span> {{ currentDemande.prisEnChargeParNom || 'Non affecté' }}</p>
           <p><span class="font-semibold text-slate-900">Région :</span> {{ currentDemande.region || '-' }}</p>
           <p><span class="font-semibold text-slate-900">Commune :</span> {{ currentDemande.commune || '-' }}</p>
           <p><span class="font-semibold text-slate-900">Statut :</span> {{ getStatusLabel(currentDemande.statut) }}</p>
@@ -58,7 +58,7 @@
           <p><span class="font-semibold text-slate-900">Prénom :</span> {{ currentDemande.prenom || '-' }}</p>
           <p><span class="font-semibold text-slate-900">Nom :</span> {{ currentDemande.nom || '-' }}</p>
           <p><span class="font-semibold text-slate-900">Téléphone :</span> {{ currentDemande.telephone || '-' }}</p>
-          <p><span class="font-semibold text-slate-900">CIN / NIN :</span> {{ currentDemande.numeroCinNin || '-' }}</p>
+          <p><span class="font-semibold text-slate-900">CIN / Passport :</span> {{ currentDemande.numeroCinNin || '-' }}</p>
           <p><span class="font-semibold text-slate-900">Programme :</span> {{ currentDemande.programme?.titre || '-' }}</p>
           <p><span class="font-semibold text-slate-900">Catégorie :</span> {{ currentDemande.programme?.categorieNom || '-' }}</p>
         </div>

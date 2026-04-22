@@ -4,7 +4,7 @@ import { finalize } from 'rxjs';
 import { Programme } from '../../models/programme.model';
 import { partners } from './constants/partners.constants';
 import { ProgrammeService } from '../programme/services/programme.service';
-import { Article } from '../../models/article.model';
+import { Article, PostType } from '../../models/article.model';
 import { ArticleService } from '../realisation-actualite/services/article.service';
 
 @Component({
@@ -15,13 +15,9 @@ import { ArticleService } from '../realisation-actualite/services/article.servic
 })
 export class AccueilComponent implements OnInit {
   newsList = signal<Article[]>([]);
-  featuredNews = computed<Article | undefined>(() => this.newsList().find((n) => n.isFeatured));
-  sideNews = computed<Article[]>(() =>
-    this.newsList()
-      .filter((n) => !n.isFeatured)
-      .slice(0, 3),
-  );
-  isNewsLoading: boolean = false;
+  featuredNews = computed<Article | undefined>(() => this.newsList()[0]);
+  sideNews = computed<Article[]>(() => this.newsList().slice(1, 4));
+  isNewsLoading = false;
 
   programmes: Programme[] = [];
   isProgramsLoading: boolean = false;
@@ -51,12 +47,13 @@ export class AccueilComponent implements OnInit {
   }
 
   loadNews(): void {
+    this.isNewsLoading = true;
     this.actualiteService
-      .getArticles()
+      .getArticlesByType('ACTUALITE' as PostType)
       .pipe(finalize(() => (this.isNewsLoading = false)))
       .subscribe({
         next: (articles) => {
-          this.newsList.set(articles);
+          this.newsList.set(articles.slice(0, 4));
         },
         error: (error) => {
           console.error(error);

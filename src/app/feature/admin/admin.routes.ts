@@ -5,6 +5,7 @@ import { AgentDemandesComponent } from './pages/agent-demandes/agent-demandes.co
 import { AdminDemandesComponent } from './pages/admin-demandes/admin-demandes.component';
 import { AdminAgentsComponent } from './pages/admin-agents/admin-agents.component';
 import { AdminCitoyensComponent } from './pages/admin-citoyens/admin-citoyens.component';
+import { AdminPostsComponent } from './pages/admin-posts/admin-posts.component';
 import { AdminProgrammesComponent } from './pages/admin-programmes/admin-programmes.component';
 
 export const ADMIN_ROUTES: Routes = [
@@ -26,6 +27,7 @@ export const ADMIN_ROUTES: Routes = [
       { path: 'demandes', component: AdminDemandesComponent, title: 'Administration - Demandes' },
       { path: 'agents', component: AdminAgentsComponent, title: 'Administration - Agents' },
       { path: 'programmes', component: AdminProgrammesComponent, title: 'Administration - Programmes' },
+      { path: 'publications', component: AdminPostsComponent, title: 'Administration - Actualités et réalisations' },
       { path: 'citoyens', component: AdminCitoyensComponent, title: 'Administration - Citoyens' },
     ],
   },

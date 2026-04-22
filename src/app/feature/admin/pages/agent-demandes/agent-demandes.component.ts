@@ -402,7 +402,11 @@ export class AgentDemandesComponent implements OnInit {
   }
 
   protected canTakeInCharge(demande: DemandeResponse): boolean {
-    return !demande.traiteParNom;
+    const alreadyAssigned = Boolean(
+      demande.traiteParId || demande.traiteParNom || demande.prisEnChargeParNom,
+    );
+
+    return demande.statut === 'EN_ATTENTE' && !alreadyAssigned;
   }
 
   protected canSetInProgress(demande: DemandeResponse): boolean {

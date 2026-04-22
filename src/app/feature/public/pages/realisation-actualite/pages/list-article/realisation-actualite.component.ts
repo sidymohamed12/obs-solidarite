@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { Article } from '../../../../models/article.model';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ArticleService } from '../../services/article.service';
 import { finalize } from 'rxjs';
+import { Article, PostType } from '../../../../models/article.model';
 
 interface Slide {
   image: string;
@@ -10,6 +10,8 @@ interface Slide {
   title: string;
   description: string;
 }
+
+type ArticleFilter = 'all' | 'actualite' | 'realisation';
 
 @Component({
   selector: 'app-realisation-actualite',
@@ -19,36 +21,23 @@ interface Slide {
 })
 export class RealisationActualiteComponent implements OnInit, OnDestroy {
   currentSlide = 0;
-  autoPlayInterval: any;
+  autoPlayInterval: ReturnType<typeof setInterval> | null = null;
 
-  slides: Slide[] = [
-    {
-      image: 'https://actu.rts.sn/wp-content/uploads/2025/10/IMG_3971.jpeg',
-      badge: 'SOLIDARITÉ NATIONALE',
-      title: 'Soutenir les familles face à la précarité',
-      description: 'PLUS DE 10 000 MÉNAGES ASSISTÉS ET UN PARTENARIAT SANITAIRE SIGNÉ À MATAM',
-    },
-    {
-      image:
-        'https://devcommunautaire.gouv.sn/sites/default/files/gbb-uploads/Plan%20de%20travail%2048.png',
-      badge: 'Santé Publique',
-      title: 'Caravane Médicale : 14 régions.',
-      description:
-        "Plus de 10 000 consultations gratuites réalisées ce mois-ci pour garantir l'accès aux soins.",
-    },
-  ];
+  slides: Slide[] = [];
+  articles = signal<Article[]>([]);
+  activeFilter = signal<ArticleFilter>('all');
+  filteredArticles = computed(() => {
+    if (this.activeFilter() === 'all') {
+      return this.articles();
+    }
 
-  articles: Article[] = [];
-  isArticleLoading: boolean = false;
+    return this.articles().filter((article) => article.type === this.activeFilter());
+  });
+  isArticleLoading = false;
 
   private readonly articleService: ArticleService = inject(ArticleService);
 
-  activeFilter = 'all';
-  displayedArticles = 3;
-  totalArticles = 142;
-
   ngOnInit(): void {
-    this.startAutoPlay();
     this.loadArticles();
   }
 
@@ -63,7 +52,17 @@ export class RealisationActualiteComponent implements OnInit, OnDestroy {
       .pipe(finalize(() => (this.isArticleLoading = false)))
       .subscribe({
         next: (articles) => {
-          this.articles = articles;
+          this.articles.set(articles);
+          this.slides = articles.slice(0, 3).map((article) => ({
+            image: article.image,
+            badge: article.typeLabel.toUpperCase(),
+            title: article.title,
+            description: article.description,
+          }));
+
+          if (this.slides.length > 1) {
+            this.startAutoPlay();
+          }
         },
         error: (error) => {
           console.error(error);
@@ -84,15 +83,27 @@ export class RealisationActualiteComponent implements OnInit, OnDestroy {
   }
 
   showSlide(index: number): void {
+    if (this.slides.length === 0) {
+      return;
+    }
+
     this.currentSlide = (index + this.slides.length) % this.slides.length;
     this.resetAutoPlay();
   }
 
   nextSlide(): void {
+    if (this.slides.length === 0) {
+      return;
+    }
+
     this.currentSlide = (this.currentSlide + 1) % this.slides.length;
   }
 
   prevSlide(): void {
+    if (this.slides.length === 0) {
+      return;
+    }
+
     this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
   }
 
@@ -102,14 +113,25 @@ export class RealisationActualiteComponent implements OnInit, OnDestroy {
   }
 
   setFilter(filter: string): void {
-    this.activeFilter = filter;
-  }
-
-  getProgressPercentage(): number {
-    return (this.displayedArticles / this.totalArticles) * 100;
+    this.activeFilter.set(filter as ArticleFilter);
   }
 
   onArticleClick(article: Article): void {
     console.log('Article clicked:', article);
+  }
+
+  protected loadType(type: PostType): void {
+    this.isArticleLoading = true;
+    this.articleService
+      .getArticlesByType(type)
+      .pipe(finalize(() => (this.isArticleLoading = false)))
+      .subscribe({
+        next: (articles) => {
+          this.articles.set(articles);
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
   }
 }

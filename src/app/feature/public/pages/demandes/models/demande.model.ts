@@ -42,6 +42,7 @@ export interface DemandeResponse {
   statut: DemandeStatut | string;
   traiteParId: number | null;
   traiteParNom: string | null;
+  prisEnChargeParNom: string | null;
   piecesJointes: DemandePieceJointe[];
   prenom?: string;
   nom?: string;
